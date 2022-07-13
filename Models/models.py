@@ -1,5 +1,4 @@
-import sqlalchemy
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Date
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Date, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -7,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
-class UsersRolesRelation():
+class UsersRolesRelation(Base):
     __tablename__ = "users_roles_relation"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('User.id'))
@@ -53,8 +52,8 @@ class Request(Base):
     status = Column(String(100), nullable=False)
     reviewer = Column(Integer, ForeignKey('users.id'))
     type_bonus = Column(Integer, ForeignKey('type_bonus.id'))
-    date_of_creation = Column(DateTime(timezone=True), server_default=sqlalchemy.sql.func.now())
-    last_changed_date = Column(Date)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     payment_date = Column(Date)
 
     creator_user = relationship("User")
