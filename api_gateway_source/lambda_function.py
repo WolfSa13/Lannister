@@ -43,7 +43,7 @@ def lambda_handler(event, context):
         # example: worker-lambda, request-lambda, bonus-lambda
         lambda_name = action_id.split('_')[0] + '-lambda'
 
-        # example 'arn:aws:lambda:us-east-1:740564522202:function:workers-lambda'
+        # example 'arn:aws:lambda:us-east-1:740564522202:function:worker-lambda'
         function_name = function_ARN + lambda_name
 
         client = boto3.client('lambda')
@@ -69,7 +69,7 @@ def lambda_handler(event, context):
         # example: worker-lambda, request-lambda, bonus-lambda
         lambda_name = callback_id.split('_')[0] + '-lambda'
 
-        # example 'arn:aws:lambda:us-east-1:740564522202:function:workers-lambda'
+        # example 'arn:aws:lambda:us-east-1:740564522202:function:worker-lambda'
         function_name = function_ARN + lambda_name
 
         client = boto3.client('lambda')
