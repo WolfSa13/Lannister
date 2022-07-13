@@ -14,7 +14,6 @@
         "action_id": callback_id #  important, not action_id, but callback_id with key action_id, it is necessary for catching this result in lambda with business logic
     }
    
-5) Do NOT touch 200 OK response, because slack will not accept it, even if "headers" will be {}, not { } (there is space there)
-6) In file slack_block_kits.py there are names for action_id of buttons, which appear at start, You can rename it as You want, but I think it will be better, when we have the same structure of these action_id
-7) To return to the start_menu with three buttons: workers, requests, bonuses, the action_id of your button have to start with "start"
+5) In file slack_block_kits.py there are names for action_id of buttons, which appear at start, You can rename it as You want, but I think it will be better, when we have the same structure of these action_id
+6) To return to the start_menu with three buttons: workers, requests, bonuses, the action_id of your button have to start with "start"
 7) Now there is my lambda ARN there, later there will be ARN from our main lambda functions
