@@ -1,9 +1,12 @@
 import json
 import boto3
+import os
 
 from services import base64_encoder, respond_with_error_return_menu, respond_with_menu
 
-function_ARN = 'arn:aws:lambda:us-east-1:740564522202:function:'
+AWS_REGION = os.environ.get('REGION)'
+AWS_ACCOUNT = os.environ.get('ACCOUNT')
+FUNCTION_ARN = f'arn:aws:lambda:{AWS_REGION}:{AWS_ACCOUNT}:function:'
 
 # DO NOT CHANGE ANYTHING!
 status_code_200 = {
@@ -44,7 +47,7 @@ def lambda_handler(event, context):
         lambda_name = action_id.split('_')[0] + '-lambda'
 
         # example 'arn:aws:lambda:us-east-1:740564522202:function:worker-lambda'
-        function_name = function_ARN + lambda_name
+        function_name = FUNCTION_ARN + lambda_name
 
         client = boto3.client('lambda')
 
@@ -70,7 +73,7 @@ def lambda_handler(event, context):
         lambda_name = callback_id.split('_')[0] + '-lambda'
 
         # example 'arn:aws:lambda:us-east-1:740564522202:function:worker-lambda'
-        function_name = function_ARN + lambda_name
+        function_name = FUNCTION_ARN + lambda_name
 
         client = boto3.client('lambda')
 
