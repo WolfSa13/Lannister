@@ -35,8 +35,6 @@ def lambda_handler(event, context):
 
         headers = {'Content-type': 'application/json'}
 
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
-
     # button responsible for posting modal, to create new bonus
     elif action_id.startswith('bonus_create'):
         data = {
@@ -51,8 +49,6 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + token
         }
 
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
-
     # button responsible for returning to the start menu
     elif action_id.startswith('bonus_start_menu'):
         data = {
@@ -64,8 +60,6 @@ def lambda_handler(event, context):
         response_url = event['response_url']
 
         headers = {'Content-type': 'application/json'}
-
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
 
     # buttons responsible for posting modal, to edit existing bonus
     elif action_id.startswith('bonus_edit'):
@@ -89,8 +83,6 @@ def lambda_handler(event, context):
                 "Authorization": "Bearer " + token
             }
 
-            res = requests.post(response_url, data=json.dumps(data), headers=headers)
-
     # buttons responsible for deleting bonus
     elif action_id.startswith('bonus_delete'):
         bonus_id = int(action_id.split('_')[2])
@@ -108,8 +100,6 @@ def lambda_handler(event, context):
         response_url = event['response_url']
 
         headers = {'Content-type': 'application/json'}
-
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('bonus_modal_create'):
         # event = {
@@ -146,8 +136,6 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + token
         }
 
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
-
     elif action_id.startswith('bonus_modal_edit'):
 
         bonus_name_block_id = event['body']['view']['blocks'][0]['block_id']
@@ -178,5 +166,5 @@ def lambda_handler(event, context):
             'Content-type': 'application/json',
             "Authorization": "Bearer " + token
         }
-
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
+    
+    res = requests.post(response_url, data=json.dumps(data), headers=headers)
