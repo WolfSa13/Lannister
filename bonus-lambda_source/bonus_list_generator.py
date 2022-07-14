@@ -1,5 +1,5 @@
 import copy
-from const import back_to_bonus_menu_button
+from const import back_to_bonus_start_menu_button
 
 template = {
     "color": "#008000",
@@ -70,6 +70,6 @@ def generate_bonus_block_list(bonus_list, template=template):
 
         attachments.append(temp)
 
-    attachments.append(back_to_bonus_menu_button)
+    attachments.append(back_to_bonus_start_menu_button)
 
     return attachments

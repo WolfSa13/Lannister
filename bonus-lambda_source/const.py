@@ -24,13 +24,13 @@ bonus_start_menu = [
                     "type": "plain_text",
                     "text": "Return to main menu"
                 },
-                "action_id": "bonus_main_menu"
+                "action_id": "start_menu"
             }
         ]
     }
 ]
 
-back_to_bonus_menu_button = {
+back_to_bonus_start_menu_button = {
     "color": "#008000",
     "blocks": [
         {
@@ -42,54 +42,12 @@ back_to_bonus_menu_button = {
                         "type": "plain_text",
                         "text": "Back"
                     },
-                    "action_id": "bonus_start"
+                    "action_id": "bonus_start_menu"
                 }
             ]
         }
     ]
 }
-
-start_menu = [
-    {
-        "type": "section",
-        "text": {
-            "type": "plain_text",
-            "text": "Hi, I'm here. What do you want to do?"
-        }
-    },
-    {
-        "type": "divider"
-    },
-    {
-        "type": "actions",
-        "elements": [
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Workers"
-                },
-                "action_id": "worker_start_menu"
-            },
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Requests"
-                },
-                "action_id": "request_start_menu"
-            },
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Bonuses"
-                },
-                "action_id": "bonus_start_menu"
-            }
-        ]
-    }
-]
 
 bonus_create_modal = {
     "title": {
@@ -135,7 +93,7 @@ bonus_create_modal = {
 }
 
 
-def edit_bonus_modal(name, description):
+def bonus_edit_modal(name, description):
     return {
         "title": {
             "type": "plain_text",

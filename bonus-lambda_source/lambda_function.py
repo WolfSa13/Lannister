@@ -1,10 +1,13 @@
 import json
 import requests
+import os
 
 from bonus_list_generator import generate_bonus_block_list, get_bonus_by_id
-from const import bonus_start_menu, start_menu, bonus_create_modal, edit_bonus_modal
+from const import bonus_start_menu, bonus_create_modal, bonus_edit_modal
 
-token = 'xoxb-3816664220352-3794386068690-fMsc3SoJJSJdx335iWY0Jb7x'
+
+token = os.environ.get('SLACK_BOT_TOKEN')
+channel = os.environ.get('CHANNEL')
 
 
 def lambda_handler(event, context):
@@ -16,23 +19,7 @@ def lambda_handler(event, context):
 
     action_id = event['action_id']
 
-    # button responsible for posting 3 buttons: Bonus list, Create_bonus, Return to main menu
-    if action_id == 'bonus_start_menu':
-
-        data = {
-            "response_type": 'in_channel',
-            "replace_original": False,
-            "blocks": bonus_start_menu
-        }
-
-        response_url = event['response_url']
-
-        headers = {'Content-type': 'application/json'}
-
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
-
-    # button responsible for posting list of possible bonuses
-    elif action_id.startswith('bonus_list'):
+    if action_id.startswith('bonus_list'):
 
         bonus_list = TypeBonusesQuery.get_bonuses()
 
@@ -67,11 +54,11 @@ def lambda_handler(event, context):
         res = requests.post(response_url, data=json.dumps(data), headers=headers)
 
     # button responsible for returning to the start menu
-    elif action_id.startswith('start'):
+    elif action_id.startswith('bonus_start_menu'):
         data = {
             "response_type": 'in_channel',
             "replace_original": False,
-            "blocks": start_menu
+            "blocks": bonus_start_menu
         }
 
         response_url = event['response_url']
@@ -88,20 +75,21 @@ def lambda_handler(event, context):
 
         bonus = get_bonus_by_id(bonus_id, bonus_list)
 
-        data = {
-            "trigger_id": event['trigger_id'],
-            "view": edit_bonus_modal(bonus['type'], bonus['description']),
-            "bonus_id": bonus_id
-        }
+        if bonus:
+            data = {
+                "trigger_id": event['trigger_id'],
+                "view": bonus_edit_modal(bonus['type'], bonus['description']),
+                "bonus_id": bonus_id
+            }
 
-        response_url = 'https://slack.com/api/views.open'
+            response_url = 'https://slack.com/api/views.open'
 
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + token
-        }
+            headers = {
+                'Content-type': 'application/json',
+                "Authorization": "Bearer " + token
+            }
 
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
+            res = requests.post(response_url, data=json.dumps(data), headers=headers)
 
     # buttons responsible for deleting bonus
     elif action_id.startswith('bonus_delete'):
@@ -137,11 +125,28 @@ def lambda_handler(event, context):
             event['body']['view']['state']['values'][bonus_description_block_id]['bonus_description_input']['value']
 
         data = {
-            'name': bonus_name,
+            'type': bonus_name,
             'description': bonus_description
         }
 
         bonus_list = TypeBonusesQuery.add_new_bonus(data)
+
+        attachments = generate_bonus_block_list(bonus_list)
+
+        data = {
+            'token': token,
+            'channel': channel,
+            "attachments": attachments
+        }
+
+        response_url = 'https://slack.com/api/chat.postMessage'
+
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + token
+        }
+
+        res = requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('bonus_modal_edit'):
 
@@ -153,8 +158,25 @@ def lambda_handler(event, context):
             event['body']['view']['state']['values'][bonus_description_block_id]['bonus_description_input']['value']
 
         data = {
-            'name': bonus_name,
+            'type': bonus_name,
             'description': bonus_description
         }
 
         bonus_list = TypeBonusesQuery.update_bonuses(event['bonus_id'], data)
+
+        attachments = generate_bonus_block_list(bonus_list)
+
+        data = {
+            'token': token,
+            'channel': channel,
+            "attachments": attachments
+        }
+
+        response_url = 'https://slack.com/api/chat.postMessage'
+
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + token
+        }
+
+        res = requests.post(response_url, data=json.dumps(data), headers=headers)
