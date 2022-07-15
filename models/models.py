@@ -2,18 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
-
 Base = declarative_base()
-
-
-class UsersRolesRelation(Base):
-    __tablename__ = "users_roles_relation"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('User.id'))
-    role_id = Column(Integer, ForeignKey('Roles.id'))
-
-    user = relationship("User")
-    roles = relationship("Roles")
 
 
 class User(Base):
@@ -33,6 +22,16 @@ class Roles(Base):
     __tablename__ = "roles"
     id = Column(Integer, primary_key=True)
     role_name = Column(String(100), nullable=False)
+
+
+class UsersRolesRelation(Base):
+    __tablename__ = "users_roles_relation"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    role_id = Column(Integer, ForeignKey('roles.id'))
+
+    user = relationship("User")
+    roles = relationship("Roles")
 
 
 class Bonus(Base):
@@ -62,5 +61,3 @@ class Request(Base):
 
     def __repr__(self):
         return '<Request {}>'.format(self.creator, self.status, self.payment_date)
-
-
