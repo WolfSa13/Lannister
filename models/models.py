@@ -45,7 +45,7 @@ class Bonus(Base):
 
 
 class Request(Base):
-    __tablename__ = "request"
+    __tablename__ = "requests"
     id = Column(Integer, primary_key=True)
     creator = Column(Integer, ForeignKey('users.id'))
     status = Column(String(100), nullable=False)
@@ -58,6 +58,15 @@ class Request(Base):
     creator_user = relationship("User")
     user_reviewer = relationship("User")
     bonus_type = relationship("Bonus")
+    request_history = relationship("RequestHistory")
 
     def __repr__(self):
         return '<Request {}>'.format(self.creator, self.status, self.payment_date)
+
+
+class RequestHistory(Base):
+    __tablename__ = "requests_history"
+    id = Column(Integer, primary_key=True)
+    status = Column(String(100), nullable=False, default='created')
+    timestamp = Column(DateTime, server_default=func.now())
+    request_id = Column(Integer, ForeignKey('requests.id'))
