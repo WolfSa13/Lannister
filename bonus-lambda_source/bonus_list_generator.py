@@ -17,7 +17,6 @@ template = {
             "fields": [
                 {
                     "type": "mrkdwn",
-                    # change (add 'Name' after \n)
                     "text": "*Description:*\n"
                 }
             ]
@@ -31,7 +30,6 @@ template = {
                         "type": "plain_text",
                         "text": "Edit"
                     },
-                    # change!
                     "action_id": "bonus_edit_"
                 },
                 {
@@ -41,7 +39,6 @@ template = {
                         "text": "Delete"
                     },
                     "style": "danger",
-                    # change!
                     "action_id": "bonus_delete_"
                 }
             ]
@@ -63,7 +60,7 @@ def generate_bonus_block_list(bonus_list, template=template):
 
     for bonus in bonus_list:
         temp = copy.deepcopy(template)
-        temp['blocks'][0]['text']['text'] = bonus['type']
+        temp['blocks'][0]['text']['text'] = bonus['name']
         temp['blocks'][1]['fields'][0]['text'] += bonus['description']
         temp['blocks'][2]['elements'][0]['action_id'] += str(bonus['id'])
         temp['blocks'][2]['elements'][1]['action_id'] += str(bonus['id'])

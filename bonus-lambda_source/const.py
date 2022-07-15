@@ -1,3 +1,22 @@
+bonus_edited_successfully = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": "Bonus was edited successfully"
+    }
+}
+
+
+def bonus_created_successfully(name):
+    return {
+        "type": "section",
+        "text": {
+            "type": "plain_text",
+            "text": f"Bonus {name} was created successfully"
+        }
+    }
+
+
 bonus_start_menu = [
     {
         "type": "actions",
@@ -93,7 +112,7 @@ bonus_create_modal = {
 }
 
 
-def bonus_edit_modal(name, description):
+def bonus_edit_modal(bonus_id, name, description):
     return {
         "title": {
             "type": "plain_text",
@@ -105,7 +124,7 @@ def bonus_edit_modal(name, description):
 
         },
         "type": "modal",
-        "callback_id": "bonus_modal_edit",
+        "callback_id": "bonus_modal_edit_" + str(bonus_id),
         "close": {
             "type": "plain_text",
             "text": "Cancel"
