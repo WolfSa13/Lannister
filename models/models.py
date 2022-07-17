@@ -10,7 +10,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     full_name = Column(String(120), unique=True, nullable=False)
     position = Column(String(100))
-    slack_id = Column(Integer, unique=True)
+    slack_id = Column(String(11), unique=True, nullable=False)
 
     user = relationship("UsersRolesRelation")
 
@@ -54,6 +54,8 @@ class Request(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     payment_date = Column(Date)
+    payment_amount = Column(Integer, default=1)
+    description = Column(Text)
 
     creator_user = relationship("User")
     user_reviewer = relationship("User")
