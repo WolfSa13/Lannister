@@ -27,11 +27,11 @@ class Roles(Base):
 class UsersRolesRelation(Base):
     __tablename__ = "users_roles_relation"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    role_id = Column(Integer, ForeignKey('roles.id'))
+    user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"))
+    role_id = Column(Integer, ForeignKey('roles.id', ondelete="CASCADE"))
 
-    user = relationship("User")
-    roles = relationship("Roles")
+    user = relationship("User", back_populates="user_roles_relation")
+    roles = relationship("Roles", back_populates="user_roles_relation")
 
 
 class Bonus(Base):
