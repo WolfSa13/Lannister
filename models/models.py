@@ -47,19 +47,19 @@ class Bonus(Base):
 class Request(Base):
     __tablename__ = "requests"
     id = Column(Integer, primary_key=True)
-    creator = Column(Integer, ForeignKey('users.id'))
+    creator = Column(Integer, ForeignKey('users.id', ondelete="SET NULL"))
     status = Column(String(100), nullable=False)
-    reviewer = Column(Integer, ForeignKey('users.id'))
-    type_bonus = Column(Integer, ForeignKey('type_bonus.id'))
+    reviewer = Column(Integer, ForeignKey('users.id', ondelete="SET NULL"))
+    type_bonus = Column(Integer, ForeignKey('type_bonus.id', ondelete="SET NULL"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     payment_date = Column(Date)
     payment_amount = Column(Integer, default=1)
     description = Column(Text)
 
-    creator_user = relationship("User")
-    user_reviewer = relationship("User")
-    bonus_type = relationship("Bonus")
+    creator_user = relationship("User", back_populates="requests")
+    user_reviewer = relationship("User", back_populates="requests")
+    bonus_type = relationship("Bonus", back_populates="requests")
     request_history = relationship("RequestHistory")
 
     def __repr__(self):
