@@ -2,12 +2,10 @@ import json
 import requests
 import os
 
-from services import generate_request_block_list, request_create_modal, request_edit_modal
-from const import request_start_menu, request_created_successfully, request_edited_successfully, request_deleted_successfully
+from message_services import *
 from orm_services import RequestQuery, UsersQuery
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
-CHANNEL = os.environ.get('CHANNEL')
 
 
 def lambda_handler(event, context):
@@ -27,14 +25,13 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        response = requests.post(response_url, data=json.dumps(data), headers=headers)
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id == 'request_list':
 
         request_list = RequestQuery.get_requests()
 
         attachments = generate_request_block_list(request_list)
-        print(attachments[0])
 
         data = {
             "response_type": 'in_channel',
@@ -49,7 +46,7 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        response = requests.post(response_url, data=json.dumps(data), headers=headers)
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id == 'request_create':
         data = {
@@ -64,7 +61,7 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        response = requests.post(response_url, data=json.dumps(data), headers=headers)
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('request_edit'):
         request_id = int(action_id.split('_')[2])
@@ -75,7 +72,6 @@ def lambda_handler(event, context):
             "trigger_id": event['trigger_id'],
             "view": request_edit_modal(request)
         }
-        print(request_edit_modal(request))
 
         response_url = 'https://slack.com/api/views.open'
 
@@ -84,7 +80,7 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        response = requests.post(response_url, data=json.dumps(data), headers=headers)
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('request_delete_'):
         request_id = int(action_id.split('_')[2])
@@ -95,7 +91,7 @@ def lambda_handler(event, context):
 
         data = {
             'token': SLACK_BOT_TOKEN,
-            'channel': CHANNEL,
+            'channel': event['user']['id'],
             "blocks": blocks
         }
 
@@ -105,7 +101,8 @@ def lambda_handler(event, context):
             'Content-type': 'application/json',
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
-        response = requests.post(response_url, data=json.dumps(data), headers=headers)
+
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('request_modal_create'):
         creator_slack_id = event['body']['user']['id']
@@ -144,7 +141,7 @@ def lambda_handler(event, context):
 
         data = {
             'token': SLACK_BOT_TOKEN,
-            'channel': CHANNEL,
+            'channel': creator_slack_id,
             "blocks": blocks
         }
 
@@ -154,13 +151,14 @@ def lambda_handler(event, context):
             'Content-type': 'application/json',
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
-        response = requests.post(response_url, data=json.dumps(data), headers=headers)
+
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('request_modal_edit'):
         request_id = int(action_id.split('_')[3])
 
         creator_slack_id = event['body']['user']['id']
-        creator_id = UsersQuery.get_user_by_slack_id(creator_slack_id)['id']
+        # creator_id = UsersQuery.get_user_by_slack_id(creator_slack_id)['id']
 
         reviewer_block_id = event['body']['view']['blocks'][0]['block_id']
         reviewer_id = \
@@ -194,8 +192,8 @@ def lambda_handler(event, context):
 
         data = {
             'token': SLACK_BOT_TOKEN,
-            'channel': CHANNEL,
-            "blocks": blocks
+            'channel': creator_slack_id,
+            'blocks': blocks
         }
 
         response_url = 'https://slack.com/api/chat.postMessage'
@@ -204,4 +202,5 @@ def lambda_handler(event, context):
             'Content-type': 'application/json',
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
-        response = requests.post(response_url, data=json.dumps(data), headers=headers)
+
+        requests.post(response_url, data=json.dumps(data), headers=headers)
