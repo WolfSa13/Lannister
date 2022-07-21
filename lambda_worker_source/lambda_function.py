@@ -1,13 +1,14 @@
 import json
 import requests
 import os
-from message_services import generate_user_block_list, users, worker_create_modal, worker_edit_modal, get_user_by_id, \
+from message_services import generate_user_block_list, worker_create_modal, worker_edit_modal, get_user_by_id, \
     user_start_menu, user_created_successfully, user_edited_successfully
 from orm_services import UsersQuery
 
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 CHANNEL = os.environ.get('CHANNEL')
+RESPONSE_URL = os.environ.get('RESPONSE_URL')
 
 
 # start action, that print three button
@@ -33,14 +34,13 @@ def lambda_handler(event, context):
     elif action_id.startswith("worker_list"):
 
         users_list = UsersQuery.get_users()
-        #users_list = users
-
         attachments = generate_user_block_list(users_list)
 
         data = {
             "response_type": 'in_channel',
             "replace_original": False,
             "attachments": attachments
+
         }
 
         response_url = event['response_url']
@@ -60,7 +60,7 @@ def lambda_handler(event, context):
             "view": worker_create_modal
         }
 
-        response_url = 'https://slack.com/api/views.open'
+        response_url = RESPONSE_URL
 
         headers = {
             'Content-type': 'application/json',
@@ -98,7 +98,7 @@ def lambda_handler(event, context):
             'slack_id': slack_id
         }
 
-        users_list = UsersQuery.add_new_user(data)
+        users = UsersQuery.add_new_user(data)
         blocks = [user_created_successfully(data), user_start_menu[0]]
 
         data = {
@@ -121,7 +121,7 @@ def lambda_handler(event, context):
     elif action_id.startswith("worker_edit"):
         user_id = int(action_id.split('_')[2])
         user = UsersQuery.get_users(user_id)
-        user = get_user_by_id(user_id, users)
+        user = get_user_by_id(user_id, user)
 
         if user:
             data = {
@@ -129,7 +129,7 @@ def lambda_handler(event, context):
                 "view": worker_edit_modal(user)
             }
 
-        response_url = 'https://slack.com/api/views.open'
+        response_url = RESPONSE_URL
         headers = {
             'Content-type': 'application/json',
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
@@ -168,7 +168,7 @@ def lambda_handler(event, context):
             'slack_id': slack_id
         }
 
-        users_list = UsersQuery.update_user(int(user_id), data)
+        user = UsersQuery.update_user(int(user_id), data)
         blocks = [user_edited_successfully(data), user_start_menu[0]]
 
         data = {
@@ -188,10 +188,10 @@ def lambda_handler(event, context):
 
 
 
-    elif action_id.startswith("worker_delete_user"):
-        user_id = int(action.split('_')[2])
+    elif action_id.startswith("worker_delete_"):
+        user_id = int(action_id.split('_')[2])
         user = UsersQuery.delete_user(user_id)
-        attachments = generate_user_block_list(users)
+        attachments = generate_user_block_list(user)
         data = {
             "response_type": 'in_channel',
             "replace_original": True,

@@ -1,32 +1,3 @@
-users = [
-    {
-        'id': 1,
-        'full_name': 'Marina Ozerova',
-        'position': 'developer',
-        'slack_id': '85413',
-        'roles': ['worker']
-
-    },
-    {
-        'id': 2,
-        'full_name': 'Petro Petrov',
-        'position': 'team lead',
-        'slack_id': '85713',
-        'roles': ['worker', 'reviewer']
-
-    },
-    {
-        'id': 3,
-        'full_name': 'Vasil Petrov',
-        'position': 'CEO',
-        'slack_id': '85613',
-        'roles': ['worker', 'reviewer', 'administrator']
-
-    }
-
-]
-
-
 def get_user_by_id(user_id, users_list):
     for user in users_list:
         if user['id'] == int(user_id):
