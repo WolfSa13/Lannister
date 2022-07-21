@@ -2,12 +2,10 @@ import json
 import requests
 import os
 
-from bonus_list_generator import generate_bonus_block_list, get_bonus_by_id
-from const import bonus_start_menu, bonus_create_modal, bonus_edit_modal, bonus_created_successfully, bonus_edited_successfully
+from message_services import *
 from orm_services import TypeBonusesQuery
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
-CHANNEL = os.environ.get('CHANNEL')
 
 
 def lambda_handler(event, context):
@@ -131,7 +129,7 @@ def lambda_handler(event, context):
 
         data = {
             'token': SLACK_BOT_TOKEN,
-            'channel': CHANNEL,
+            'channel': event['body']['user']['id'],
             "blocks": blocks
         }
 
@@ -169,7 +167,7 @@ def lambda_handler(event, context):
 
         data = {
             'token': SLACK_BOT_TOKEN,
-            'channel': CHANNEL,
+            'channel': event['body']['user']['id'],
             "blocks": blocks
         }
 
@@ -180,4 +178,4 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-    res = requests.post(response_url, data=json.dumps(data), headers=headers)
+    requests.post(response_url, data=json.dumps(data), headers=headers)
