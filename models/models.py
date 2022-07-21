@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Date, func
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Date, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -8,67 +8,95 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    full_name = Column(String(120), unique=True, nullable=False)
+    full_name = Column(String(50), unique=True, nullable=False)
     position = Column(String(100))
     slack_id = Column(String(11), unique=True, nullable=False)
 
-    user = relationship("UsersRolesRelation")
+    users_roles = relationship("UsersRolesRelation", back_populates='user')
 
-    def __repr__(self):
-        return '<User {}>'.format(self.full_name, self.position)
+    def __init__(self, full_name, position, slack_id):
+        self.full_name = full_name
+        self.position = position
+        self.slack_id = slack_id
 
 
 class Roles(Base):
     __tablename__ = "roles"
     id = Column(Integer, primary_key=True)
-    role_name = Column(String(100), nullable=False)
+    role_name = Column(String(20), nullable=False)
+
+    roles_users = relationship("UsersRolesRelation", back_populates='role')
+
+    def __init__(self, role_name):
+        self.role_name = role_name
 
 
 class UsersRolesRelation(Base):
     __tablename__ = "users_roles_relation"
     id = Column(Integer, primary_key=True)
+
     user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"))
     role_id = Column(Integer, ForeignKey('roles.id', ondelete="CASCADE"))
 
-    user = relationship("User", back_populates="user_roles_relation")
-    roles = relationship("Roles", back_populates="user_roles_relation")
+    user = relationship("User", back_populates="users_roles")
+    role = relationship("Roles", back_populates="roles_users")
+
+    def __init__(self, user_id, role_id):
+        self.user_id = user_id
+        self.role_id = role_id
 
 
 class Bonus(Base):
     __tablename__ = "type_bonus"
     id = Column(Integer, primary_key=True)
     type = Column(String(20), nullable=False)
-    description = Column(Text)
+    description = Column(String(100))
 
-    def __repr__(self):
-        return '<Bonus {}>'.format(self.type, self.description)
+    requests = relationship("Request", back_populates="bonus_type")
+
+    def __init__(self, type, description=""):
+        self.type = type
+        self.description = description
 
 
 class Request(Base):
     __tablename__ = "requests"
     id = Column(Integer, primary_key=True)
-    creator = Column(Integer, ForeignKey('users.id', ondelete="SET NULL"))
-    status = Column(String(100), nullable=False)
-    reviewer = Column(Integer, ForeignKey('users.id', ondelete="SET NULL"))
-    type_bonus = Column(Integer, ForeignKey('type_bonus.id', ondelete="SET NULL"))
+    status = Column(String(20), nullable=False, default='created')
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     payment_date = Column(Date)
     payment_amount = Column(Integer, default=1)
-    description = Column(Text)
+    description = Column(String(100))
 
-    creator_user = relationship("User", back_populates="requests")
-    user_reviewer = relationship("User", back_populates="requests")
+    creator = Column(Integer, ForeignKey('users.id', ondelete="SET NULL"))
+    reviewer = Column(Integer, ForeignKey('users.id', ondelete="SET NULL"))
+    type_bonus = Column(Integer, ForeignKey('type_bonus.id', ondelete="SET NULL"))
+
+    creator_user = relationship("User", foreign_keys="Request.creator")
+    reviewer_user = relationship("User", foreign_keys="Request.reviewer")
     bonus_type = relationship("Bonus", back_populates="requests")
-    request_history = relationship("RequestHistory")
+    request_history = relationship("RequestHistory", back_populates="requests")
 
-    def __repr__(self):
-        return '<Request {}>'.format(self.creator, self.status, self.payment_date)
+    def __init__(self, creator, reviewer, type_bonus, payment_amount, payment_date, description=""):
+        self.creator = creator
+        self.reviewer = reviewer
+        self.type_bonus = type_bonus
+        self.payment_amount = payment_amount
+        self.payment_date = payment_date
+        self.description = description
 
 
 class RequestHistory(Base):
     __tablename__ = "requests_history"
     id = Column(Integer, primary_key=True)
-    status = Column(String(100), nullable=False, default='created')
+    status = Column(String(20), nullable=False, default='created')
     timestamp = Column(DateTime, server_default=func.now())
+
     request_id = Column(Integer, ForeignKey('requests.id'))
+
+    requests = relationship("Request", back_populates="request_history")
+
+    def __init__(self, request_id, status):
+        self.request_id = request_id
+        self.status = status
