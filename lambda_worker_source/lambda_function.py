@@ -1,13 +1,10 @@
 import json
 import requests
 import os
-from message_services import generate_user_block_list, worker_create_modal, worker_edit_modal, get_user_by_id, \
-    user_start_menu, user_created_successfully, user_edited_successfully
+from message_services import *
 from orm_services import UsersQuery
 
-
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
-CHANNEL = os.environ.get('CHANNEL')
 RESPONSE_URL = 'https://slack.com/api/views.open'
 
 
@@ -29,7 +26,7 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith("worker_list"):
 
@@ -50,8 +47,7 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
-
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     # create new user modal window
     elif action_id.startswith("worker_create"):
@@ -67,8 +63,8 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
 
         }
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
 
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id == "worker_modal_create":
         full_name_block_id = event['body']['view']['blocks'][0]['block_id']
@@ -103,7 +99,7 @@ def lambda_handler(event, context):
 
         data = {
             "token": SLACK_BOT_TOKEN,
-            'channel': CHANNEL,
+            'channel': event['body']['user']['id'],
             "blocks": blocks
         }
 
@@ -114,8 +110,7 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
-
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     # modal window for edit user profile
     elif action_id.startswith("worker_edit"):
@@ -134,8 +129,8 @@ def lambda_handler(event, context):
             'Content-type': 'application/json',
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
 
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith("worker_modal_edit"):
 
@@ -173,7 +168,7 @@ def lambda_handler(event, context):
 
         data = {
             "token": SLACK_BOT_TOKEN,
-            'channel': CHANNEL,
+            'channel': event['body']['user']['id'],
             "blocks": blocks
         }
 
@@ -184,9 +179,7 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
-
-
+        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith("worker_delete_"):
         user_id = int(action_id.split('_')[2])
@@ -203,5 +196,4 @@ def lambda_handler(event, context):
             'Content-type': 'application/json'
         }
 
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
-
+        requests.post(response_url, data=json.dumps(data), headers=headers)
