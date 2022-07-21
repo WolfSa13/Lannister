@@ -8,7 +8,7 @@ from orm_services import UsersQuery
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 CHANNEL = os.environ.get('CHANNEL')
-RESPONSE_URL = os.environ.get('RESPONSE_URL')
+RESPONSE_URL = 'https://slack.com/api/views.open'
 
 
 # start action, that print three button
