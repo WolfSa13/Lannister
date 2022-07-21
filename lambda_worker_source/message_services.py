@@ -1,3 +1,28 @@
+roles_options = [
+    {
+        "text": {
+            "type": "mrkdwn",
+            "text": "worker"
+        },
+        "value": "worker"
+    },
+    {
+        "text": {
+            "type": "mrkdwn",
+            "text": "reviewer"
+        },
+        "value": "reviewer"
+    },
+    {
+        "text": {
+            "type": "mrkdwn",
+            "text": "administrator"
+        },
+        "value": "administrator"
+    }
+]
+
+
 def get_user_by_id(user_id, users_list):
     for user in users_list:
         if user['id'] == int(user_id):
@@ -217,6 +242,7 @@ def worker_edit_modal(user):
         ]
     }
 
+
 def user_created_successfully(data):
     return {
         "type": "section",
@@ -289,27 +315,3 @@ back_to_user_start_menu_button = {
         }
     ]
 }
-
-roles_options = [
-    {
-        "text": {
-            "type": "mrkdwn",
-            "text": "worker"
-        },
-        "value": "worker"
-    },
-    {
-        "text": {
-            "type": "mrkdwn",
-            "text": "reviewer"
-        },
-        "value": "reviewer"
-    },
-    {
-        "text": {
-            "type": "mrkdwn",
-            "text": "administrator"
-        },
-        "value": "administrator"
-    }
-]

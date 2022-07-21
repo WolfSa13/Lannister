@@ -123,7 +123,7 @@ def lambda_handler(event, context):
 
         bonus_list = TypeBonusesQuery.add_new_bonus(data)
 
-        attachments = generate_bonus_block_list(bonus_list)
+        # attachments = generate_bonus_block_list(bonus_list)
 
         blocks = [bonus_created_successfully(bonus_name), bonus_start_menu[0]]
 
