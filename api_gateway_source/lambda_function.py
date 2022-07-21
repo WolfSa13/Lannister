@@ -1,15 +1,7 @@
-import json
-import boto3
-import os
+from utils import base64_encoder, resolve_function_name, invoke_lambda
+from message_services import respond_with_error_return_menu, respond_with_menu
 
-from services import base64_encoder, respond_with_error_return_menu, respond_with_menu
-
-AWS_REGION = os.environ.get('REGION)'
-AWS_ACCOUNT = os.environ.get('ACCOUNT')
-FUNCTION_ARN = f'arn:aws:lambda:{AWS_REGION}:{AWS_ACCOUNT}:function:'
-
-# DO NOT CHANGE ANYTHING!
-status_code_200 = {
+STATUS_CODE_200 = {
     "isBase64Encoded": True,
     "statusCode": 200,
     "headers": {},
@@ -32,24 +24,20 @@ def lambda_handler(event, context):
     # when the button was clicked in the chat
     elif body['type'] == 'block_actions':
         action_id = body['actions'][0]['action_id']
+        lambda_to_invoke = action_id.split('_')[0]
 
         # when 'Return to main menu' button was clicked
         if action_id.startswith('start'):
             respond_with_menu(body['response_url'])
-            return status_code_200
 
+            return STATUS_CODE_200
         # check if correct action_id was sent
-        elif action_id.split('_')[0] not in ['worker', 'request', 'bonus']:
+        elif lambda_to_invoke not in ['worker', 'request', 'bonus']:
             respond_with_error_return_menu(body['response_url'])
-            return status_code_200
 
-        # example: worker-lambda, request-lambda, bonus-lambda
-        lambda_name = action_id.split('_')[0] + '-lambda'
+            return STATUS_CODE_200
 
-        # example 'arn:aws:lambda:us-east-1:740564522202:function:worker-lambda'
-        function_name = FUNCTION_ARN + lambda_name
-
-        client = boto3.client('lambda')
+        function_name = resolve_function_name(lambda_to_invoke)
 
         data = {
             "response_url": body['response_url'],
@@ -58,35 +46,22 @@ def lambda_handler(event, context):
             "action_id": action_id
         }
 
-        response = client.invoke(
-            FunctionName=function_name,
-            InvocationType='Event',
-            Payload=json.dumps(data)
-        )
+        invoke_lambda(function_name, data)
 
     # when the modal was submitted
     elif body['type'] == 'view_submission':
 
         callback_id = body['view']['callback_id']
-
-        # example: worker-lambda, request-lambda, bonus-lambda
-        lambda_name = callback_id.split('_')[0] + '-lambda'
+        lambda_to_invoke = callback_id.split('_')[0]
 
         # example 'arn:aws:lambda:us-east-1:740564522202:function:worker-lambda'
-        function_name = FUNCTION_ARN + lambda_name
-
-        client = boto3.client('lambda')
+        function_name = resolve_function_name(lambda_to_invoke)
 
         data = {
             "body": body,
             "action_id": callback_id
         }
 
-        response = client.invoke(
-            FunctionName=function_name,
-            InvocationType='Event',
-            Payload=json.dumps(data)
-        )
+        invoke_lambda(function_name, data)
 
-    # return 200 OK status
-    return status_code_200
+    return STATUS_CODE_200
