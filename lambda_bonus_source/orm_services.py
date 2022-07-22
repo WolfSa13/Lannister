@@ -31,7 +31,7 @@ class TypeBonusesQuery:
                 result.append(
                     {
                         "id": bonus[0],
-                        "name": bonus[1],
+                        "type": bonus[1],
                         "description": bonus[2]
                     }
                 )
@@ -47,9 +47,9 @@ class TypeBonusesQuery:
 
             session.commit()
 
-            query_result = TypeBonusesQuery.get_bonuses()
+            # query_result = TypeBonusesQuery.get_bonuses()
 
-        return query_result
+        return 1
 
     @staticmethod
     def delete_bonuses(bonus_id):
@@ -70,8 +70,7 @@ class TypeBonusesQuery:
     def add_new_bonus(data):
         with Session(TypeBonusesQuery.engine) as session:
             try:
-                insert = TypeBonusesQuery.TypeBonuses.insert().values(name=data['name'], description=data['description'])
-
+                insert = TypeBonusesQuery.TypeBonuses.insert().values(type=data['type'], description=data['description'])
                 session.execute(insert)
                 session.commit()
 
@@ -80,4 +79,4 @@ class TypeBonusesQuery:
                 session.rollback()
                 return 0
 
-        return result
+        return 1

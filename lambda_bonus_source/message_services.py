@@ -1,51 +1,3 @@
-import copy
-
-template = {
-    "color": "#008000",
-    "blocks": [
-        {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                # change!
-                "text": None
-            }
-        },
-        {
-            "type": "section",
-            "fields": [
-                {
-                    "type": "mrkdwn",
-                    "text": "*Description:*\n"
-                }
-            ]
-        },
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Edit"
-                    },
-                    "action_id": "bonus_edit_"
-                },
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Delete"
-                    },
-                    "style": "danger",
-                    "action_id": "bonus_delete_"
-                }
-            ]
-        }
-    ]
-}
-
-
 def get_bonus_by_id(bonus_id, bonus_list):
     for bonus in bonus_list:
         if bonus['id'] == bonus_id:
@@ -54,17 +6,55 @@ def get_bonus_by_id(bonus_id, bonus_list):
     return None
 
 
-def generate_bonus_block_list(bonus_list, template=template):
+def generate_bonus_block_list(bonus_list):
     attachments = []
 
     for bonus in bonus_list:
-        temp = copy.deepcopy(template)
-        temp['blocks'][0]['text']['text'] = bonus['name']
-        temp['blocks'][1]['fields'][0]['text'] += bonus['description']
-        temp['blocks'][2]['elements'][0]['action_id'] += str(bonus['id'])
-        temp['blocks'][2]['elements'][1]['action_id'] += str(bonus['id'])
+        bonus_item = {
+            "color": "#008000",
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": bonus['type']
+                    }
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Description:*\n" + bonus['description']
+                        }
+                    ]
+                },
+                {
+                    "type": "actions",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Edit"
+                            },
+                            "action_id": f"bonus_edit_{bonus['id']}"
+                        },
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Delete"
+                            },
+                            "style": "danger",
+                            "action_id": f"bonus_delete_{bonus['id']}"
+                        }
+                    ]
+                }
+            ]
+        }
 
-        attachments.append(temp)
+        attachments.append(bonus_item)
 
     attachments.append(back_to_bonus_start_menu_button)
 
@@ -185,7 +175,7 @@ bonus_create_modal = {
 }
 
 
-def bonus_edit_modal(bonus_id, name, description):
+def bonus_edit_modal(bonus):
     return {
         "title": {
             "type": "plain_text",
@@ -197,7 +187,7 @@ def bonus_edit_modal(bonus_id, name, description):
 
         },
         "type": "modal",
-        "callback_id": "bonus_modal_edit_" + str(bonus_id),
+        "callback_id": f"bonus_modal_edit_{bonus['id']}",
         "close": {
             "type": "plain_text",
             "text": "Cancel"
@@ -212,7 +202,7 @@ def bonus_edit_modal(bonus_id, name, description):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "bonus_name_input",
-                    "initial_value": name
+                    "initial_value": bonus['type']
                 },
             },
             {
@@ -224,7 +214,7 @@ def bonus_edit_modal(bonus_id, name, description):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "bonus_description_input",
-                    "initial_value": description,
+                    "initial_value": bonus['description'],
                     "multiline": True
                 }
             }
