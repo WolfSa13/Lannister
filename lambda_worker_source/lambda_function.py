@@ -61,7 +61,6 @@ def lambda_handler(event, context):
         headers = {
             'Content-type': 'application/json',
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
-
         }
 
         requests.post(response_url, data=json.dumps(data), headers=headers)
@@ -81,11 +80,10 @@ def lambda_handler(event, context):
         selected_options = event['body']['view']['state']['values'][roles_block_id]['worker_roles_input'][
             'selected_options']
         for option in selected_options:
-            roles.append(option['value'])
+            roles.append(int(option['value']))
 
         slack_id_block_id = event['body']['view']['blocks'][3]['block_id']
         slack_id = event['body']['view']['state']['values'][slack_id_block_id]['slack_id_input']['value']
-        slack_id = slack_id.replace('+', ' ')
 
         data = {
             'full_name': full_name,
@@ -94,13 +92,14 @@ def lambda_handler(event, context):
             'slack_id': slack_id
         }
 
-        users = UsersQuery.add_new_user(data)
-        blocks = [user_created_successfully(data), user_start_menu[0]]
+        UsersQuery.add_new_user(data)
+        print(f'created user data {data}')
+        # blocks = [user_created_successfully(data), user_start_menu[0]]
 
         data = {
             "token": SLACK_BOT_TOKEN,
             'channel': event['body']['user']['id'],
-            "blocks": blocks
+            # "blocks": blocks
         }
 
         response_url = 'https://slack.com/api/chat.postMessage'
@@ -115,8 +114,7 @@ def lambda_handler(event, context):
     # modal window for edit user profile
     elif action_id.startswith("worker_edit"):
         user_id = int(action_id.split('_')[2])
-        user = UsersQuery.get_users(user_id)
-        user = get_user_by_id(user_id, user)
+        user = UsersQuery.get_users(user_id)[0]
 
         if user:
             data = {
@@ -134,7 +132,7 @@ def lambda_handler(event, context):
 
     elif action_id.startswith("worker_modal_edit"):
 
-        user_id = action_id.split('_')[3]
+        user_id = int(action_id.split('_')[3])
 
         full_name_block_id = event['body']['view']['blocks'][0]['block_id']
         full_name = event['body']['view']['state']['values'][full_name_block_id]['full_name_input']['value']
@@ -149,12 +147,18 @@ def lambda_handler(event, context):
 
         selected_options = event['body']['view']['state']['values'][roles_block_id]['worker_roles_input'][
             'selected_options']
+
+        print(f'selected options {selected_options}')
+
         for option in selected_options:
-            roles.append(option['value'])
+            print(option)
+            print(f"roles.append(int({option['value']}))")
+            roles.append(int(option['value']))
 
         slack_id_block_id = event['body']['view']['blocks'][3]['block_id']
         slack_id = event['body']['view']['state']['values'][slack_id_block_id]['slack_id_input']['value']
-        slack_id = slack_id.replace('+', ' ')
+
+        print(roles)
 
         data = {
             'full_name': full_name,
@@ -162,14 +166,16 @@ def lambda_handler(event, context):
             'roles': roles,
             'slack_id': slack_id
         }
+        print(f'edited user data {data}')
 
-        user = UsersQuery.update_user(int(user_id), data)
-        blocks = [user_edited_successfully(data), user_start_menu[0]]
+        UsersQuery.update_user(user_id, data)
+        print(f'edited user id {user_id}, edited user data {data}')
+        # blocks = [user_edited_successfully(data), user_start_menu[0]]
 
         data = {
             "token": SLACK_BOT_TOKEN,
             'channel': event['body']['user']['id'],
-            "blocks": blocks
+            # "blocks": blocks
         }
 
         response_url = 'https://slack.com/api/chat.postMessage'

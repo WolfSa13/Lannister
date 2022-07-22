@@ -4,21 +4,21 @@ roles_options = [
             "type": "mrkdwn",
             "text": "worker"
         },
-        "value": "worker"
+        "value": "1"
     },
     {
         "text": {
             "type": "mrkdwn",
             "text": "reviewer"
         },
-        "value": "reviewer"
+        "value": "2"
     },
     {
         "text": {
             "type": "mrkdwn",
             "text": "administrator"
         },
-        "value": "administrator"
+        "value": "3"
     }
 ]
 
@@ -160,12 +160,19 @@ worker_create_modal = {
 
 
 def initial_role_block(role):
+    if role == 'worker':
+        value = '1'
+    elif role == 'reviewer':
+        value = '2'
+    elif role == 'administrator':
+        value = '3'
+
     return {
         "text": {
             "type": "mrkdwn",
             "text": role
         },
-        "value": role
+        "value": value
     }
 
 
