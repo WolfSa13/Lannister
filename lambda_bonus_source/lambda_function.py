@@ -33,7 +33,10 @@ def lambda_handler(event, context):
 
         response_url = event['response_url']
 
-        headers = {'Content-type': 'application/json'}
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + SLACK_BOT_TOKEN
+        }
 
     # button responsible for posting modal, to create new bonus
     elif action_id.startswith('bonus_create'):
@@ -59,7 +62,10 @@ def lambda_handler(event, context):
 
         response_url = event['response_url']
 
-        headers = {'Content-type': 'application/json'}
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + SLACK_BOT_TOKEN
+        }
 
     # buttons responsible for posting modal, to edit existing bonus
     elif action_id.startswith('bonus_edit'):
@@ -70,7 +76,7 @@ def lambda_handler(event, context):
         if bonus:
             data = {
                 "trigger_id": event['trigger_id'],
-                "view": bonus_edit_modal(bonus_id, bonus['name'], bonus['description'])
+                "view": bonus_edit_modal(bonus)
             }
 
             response_url = 'https://slack.com/api/views.open'
@@ -96,7 +102,10 @@ def lambda_handler(event, context):
 
         response_url = event['response_url']
 
-        headers = {'Content-type': 'application/json'}
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + SLACK_BOT_TOKEN
+        }
 
     elif action_id.startswith('bonus_modal_create'):
         '''
@@ -117,13 +126,11 @@ def lambda_handler(event, context):
         bonus_description = bonus_description.replace('+', ' ')
 
         data = {
-            'name': bonus_name,
+            'type': bonus_name,
             'description': bonus_description
         }
 
-        bonus_list = TypeBonusesQuery.add_new_bonus(data)
-
-        # attachments = generate_bonus_block_list(bonus_list)
+        TypeBonusesQuery.add_new_bonus(data)
 
         blocks = [bonus_created_successfully(bonus_name), bonus_start_menu[0]]
 
@@ -142,7 +149,7 @@ def lambda_handler(event, context):
 
     elif action_id.startswith('bonus_modal_edit'):
 
-        bonus_id = action_id.split('_')[3]
+        bonus_id = int(action_id.split('_')[3])
 
         bonus_name_block_id = event['body']['view']['blocks'][0]['block_id']
         bonus_description_block_id = event['body']['view']['blocks'][1]['block_id']
@@ -155,13 +162,11 @@ def lambda_handler(event, context):
         bonus_description = bonus_description.replace('+', ' ')
 
         data = {
-            'name': bonus_name,
+            'type': bonus_name,
             'description': bonus_description
         }
 
-        bonus_list = TypeBonusesQuery.update_bonuses(bonus_id, data)
-
-        attachments = generate_bonus_block_list(bonus_list)
+        TypeBonusesQuery.update_bonuses(bonus_id, data)
 
         blocks = [bonus_edited_successfully, bonus_start_menu[0]]
 

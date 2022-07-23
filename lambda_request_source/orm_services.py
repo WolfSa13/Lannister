@@ -37,27 +37,7 @@ class RequestQuery:
                 .join(creator, Requests.c.creator == creator.c.id) \
                 .join(reviewer, Requests.c.reviewer == reviewer.c.id).all()
 
-            result = []
-            for request in query_result:
-                result.append(
-                    {
-                        'id': request[0],
-                        'creator': request[1],
-                        'status': request[2],
-                        'reviewer': request[3],
-                        'type_bonus': request[4],
-                        'created_at': request[5],
-                        'updated_at': request[6],
-                        'payment_date': request[7],
-                        'payment_amount': request[8],
-                        'description': request[9],
-                        'bonus_name': request[10],
-                        'creator_name': request[11],
-                        'reviewer_name': request[12],
-                    }
-                )
-
-        return result
+        return query_result
 
     @staticmethod
     def update_request(request_id, data):
