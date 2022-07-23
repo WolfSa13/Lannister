@@ -51,15 +51,10 @@ def generate_user_block_list(user_list):
                         {
                             "type": "mrkdwn",
                             "text": f"Position: {user['position']}"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "fields": [
+                        },
                         {
                             "type": "mrkdwn",
-                            "text": f"Roles: {user['roles']}"
+                            "text": f"Roles: {'- '.join(user['roles'])}"
                         }
                     ]
                 },
@@ -280,7 +275,7 @@ user_start_menu = [
                 "type": "button",
                 "text": {
                     "type": "plain_text",
-                    "text": "Users List"
+                    "text": "Workers List"
                 },
                 "action_id": "worker_list"
             },
@@ -288,7 +283,7 @@ user_start_menu = [
                 "type": "button",
                 "text": {
                     "type": "plain_text",
-                    "text": "Create user"
+                    "text": "Create worker"
                 },
                 "action_id": "worker_create"
             },
