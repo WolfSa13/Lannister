@@ -26,28 +26,21 @@ class TypeBonusesQuery:
                 query = query.filter(TypeBonusesQuery.TypeBonuses.columns.id == bonus_id)
 
             query_result = query.all()
-            result = []
-            for bonus in query_result:
-                result.append(
-                    {
-                        "id": bonus[0],
-                        "type": bonus[1],
-                        "description": bonus[2]
-                    }
-                )
 
-        return result
+        return query_result
 
     @staticmethod
     def update_bonuses(bonus_id, data):
         with Session(TypeBonusesQuery.engine) as session:
-            query = session.query(TypeBonusesQuery.TypeBonuses)
-            query = query.filter(TypeBonusesQuery.TypeBonuses.columns.id == bonus_id)
-            query.update(data)
+            try:
+                query = session.query(TypeBonusesQuery.TypeBonuses).filter(
+                    TypeBonusesQuery.TypeBonuses.columns.id == bonus_id)
+                query.update(data)
 
-            session.commit()
-
-            # query_result = TypeBonusesQuery.get_bonuses()
+                session.commit()
+            except db.exc.SQLAlchemyError as e:
+                session.rollback()
+                return 0
 
         return 1
 
@@ -55,26 +48,25 @@ class TypeBonusesQuery:
     def delete_bonuses(bonus_id):
         with Session(TypeBonusesQuery.engine) as session:
             try:
-                query = session.query(TypeBonusesQuery.TypeBonuses).filter(TypeBonusesQuery.TypeBonuses.columns.id == bonus_id)
+                query = session.query(TypeBonusesQuery.TypeBonuses).filter(
+                    TypeBonusesQuery.TypeBonuses.columns.id == bonus_id)
                 query.delete()
 
                 session.commit()
-                query_result = TypeBonusesQuery.get_bonuses()
             except db.exc.SQLAlchemyError as e:
                 session.rollback()
                 return 0
 
-        return query_result
+        return 1
 
     @staticmethod
     def add_new_bonus(data):
         with Session(TypeBonusesQuery.engine) as session:
             try:
-                insert = TypeBonusesQuery.TypeBonuses.insert().values(type=data['type'], description=data['description'])
+                insert = TypeBonusesQuery.TypeBonuses.insert().values(type=data['type'],
+                                                                      description=data['description'])
                 session.execute(insert)
                 session.commit()
-
-                result = TypeBonusesQuery.get_bonuses()
             except db.exc.SQLAlchemyError as e:
                 session.rollback()
                 return 0
