@@ -72,7 +72,7 @@ class UsersQuery:
 
                 for user_role in user_roles:
                     if user_role.role_id not in roles_data:
-                        session.query(UsersRolesRelation).filter(UsersRolesRelation.id == user_role.role_id).delete()
+                        session.query(UsersRolesRelation).filter(UsersRolesRelation.id == user_role.id).delete()
                     else:
                         roles_data.remove(user_role.role_id)
 

@@ -36,7 +36,7 @@ def generate_user_block_list(user_list):
 
     for user in user_list:
         user_item = {
-            "color": "#854845",
+            "color": "#008000",
             "blocks": [
                 {
                     "type": "header",
@@ -50,11 +50,11 @@ def generate_user_block_list(user_list):
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"Position: {user['position']}"
+                            "text": f"*Position:* {user['position']}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"Roles: {'- '.join(user['roles'])}"
+                            "text": f"*Roles:* {', '.join(user['roles'])}"
                         }
                     ]
                 },
@@ -179,18 +179,18 @@ def worker_edit_modal(user):
     return {
         "title": {
             "type": "plain_text",
-            "text": "Create new user"
+            "text": "Edit worker"
         },
         "submit": {
             "type": "plain_text",
-            "text": "Create"
+            "text": "Submit"
         },
-        "type": "modal",
-        "callback_id": "worker_modal_edit_" + str(user['id']),
         "close": {
             "type": "plain_text",
             "text": "Cancel"
         },
+        "type": "modal",
+        "callback_id": "worker_modal_edit_" + str(user['id']),
         "blocks": [
             {
                 "type": "input",
