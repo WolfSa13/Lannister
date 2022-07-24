@@ -145,10 +145,6 @@ def generate_request_block_list(request_list):
 
     for request in request_list:
 
-        updated_at = request['updated_at']
-        if not updated_at:
-            updated_at = "Wasn't updated yet."
-
         payment_date = request['payment_date']
         if not payment_date:
             payment_date = "Wasn't approved yet."
@@ -189,7 +185,7 @@ def generate_request_block_list(request_list):
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"*Creation date:* {request['created_at']}\n*Payment date:* {payment_date}\n*Last changed:* {updated_at}"
+                            "text": f"*Creation date:* {request['created_at']}\n*Payment date:* {payment_date}"
                         }
                     ]
                 },
