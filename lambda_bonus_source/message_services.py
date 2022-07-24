@@ -25,7 +25,7 @@ def generate_bonus_block_list(bonus_list):
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": "*Description:*\n" + bonus['description']
+                            "text": f"*Description:* {bonus['description']}"
                         }
                     ]
                 },
