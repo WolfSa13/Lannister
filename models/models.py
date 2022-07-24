@@ -90,13 +90,15 @@ class Request(Base):
 class RequestHistory(Base):
     __tablename__ = "requests_history"
     id = Column(Integer, primary_key=True)
-    status = Column(String(20), nullable=False, default='created')
+    changes = Column(String(200), nullable=False, default='created')
     timestamp = Column(DateTime, server_default=func.now())
+    editor = Column(String(50), nullable=False)
 
     request_id = Column(Integer, ForeignKey('requests.id'))
 
     requests = relationship("Request", back_populates="request_history")
 
-    def __init__(self, request_id, status):
+    def __init__(self, request_id, changes, editor):
         self.request_id = request_id
-        self.status = status
+        self.changes = changes
+        self.editor = editor
