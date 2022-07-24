@@ -269,6 +269,16 @@ def user_edited_successfully(data):
 
 user_start_menu = [
     {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Workers"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
         "type": "actions",
         "elements": [
             {

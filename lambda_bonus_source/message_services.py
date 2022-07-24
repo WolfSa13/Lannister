@@ -82,6 +82,16 @@ def bonus_created_successfully(name):
 
 bonus_start_menu = [
     {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Bonuses"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
         "type": "actions",
         "elements": [
             {
