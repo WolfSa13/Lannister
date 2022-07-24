@@ -23,7 +23,7 @@ def lambda_handler(event, context):
         respond_with_menu(body['response_url'])
 
     # when the button was clicked in the chat
-    elif body['type'] == 'block_actions':
+    elif body['type'] == 'block_actions' and 'response_url' in body:
         action_id = body['actions'][0]['action_id']
         lambda_to_invoke = action_id.split('_')[0]
 
