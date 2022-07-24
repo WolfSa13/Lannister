@@ -82,6 +82,55 @@ def lambda_handler(event, context):
 
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
+    elif action_id.startswith('request_history_'):
+        request_id = int(action_id.split('_')[2])
+
+        # request_history_list = query_to_get_history_requests(request_id)
+
+        request_history_list = [
+            {
+                'id': 1,
+                'request_id': request_id,
+                'timestamp': '24-07-2022 14:22',
+                'editor_id': 1,
+                'editor_name': 'Vova',
+                'changes': 'abc'
+            },
+            {
+                'id': 2,
+                'request_id': request_id,
+                'timestamp': '23-07-2022 13:22',
+                'editor_id': 1,
+                'editor_name': 'Vitalik',
+                'changes': 'abc'
+            },
+            {
+                'id': 3,
+                'request_id': request_id,
+                'timestamp': '22-07-2022 20:22',
+                'editor_id': 1,
+                'editor_name': 'Mariana',
+                'changes': 'abc'
+            },
+        ]
+
+        attachments = generate_request_history_block_list(request_history_list)
+
+        data = {
+            "response_type": 'in_channel',
+            "replace_original": False,
+            "attachments": attachments
+        }
+
+        response_url = event['response_url']
+
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + SLACK_BOT_TOKEN
+        }
+
+        requests.post(response_url, data=json.dumps(data), headers=headers)
+
     elif action_id.startswith('request_delete_'):
         request_id = int(action_id.split('_')[2])
 

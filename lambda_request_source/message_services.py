@@ -205,6 +205,14 @@ def generate_request_block_list(request_list):
                             "type": "button",
                             "text": {
                                 "type": "plain_text",
+                                "text": "Changes history"
+                            },
+                            "action_id": f"request_history_{request['id']}"
+                        },
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
                                 "text": "Edit"
                             },
                             "action_id": f"request_edit_{request['id']}"
@@ -225,6 +233,91 @@ def generate_request_block_list(request_list):
         attachments.append(request_item)
 
     attachments.append(back_to_request_start_menu_button)
+
+    return attachments
+
+
+def request_history_string(request_id):
+    return {
+        "color": "#008000",
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": f"History of request #{request_id}"
+                }
+            }
+        ]
+    }
+
+
+back_to_request_list_button = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": "request_list"
+                }
+            ]
+        }
+    ]
+}
+
+
+def generate_request_history_block_list(request_history_list):
+    """
+    request_history_list = [
+            {
+                'id': 1,
+                'request_id': 1,
+                'timestamp': '24-07-2022 14:22',
+                'editor_id': 1,
+                'editor_name': 'Name',
+                'changes': 'abc'
+            }
+        ]
+    """
+
+    attachments = [request_history_string(request_history_list[0]['request_id'])]
+
+    for request_history_event in request_history_list:
+        request_history_item = {
+            "color": "#09ab19",
+            "blocks": [
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Editor:* {request_history_event['editor_name']}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*When:* {request_history_event['timestamp']}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*Changes:* {request_history_event['changes']}"
+                    }
+                }
+            ]
+        }
+
+        attachments.append(request_history_item)
+
+    attachments.append(back_to_request_list_button)
 
     return attachments
 
