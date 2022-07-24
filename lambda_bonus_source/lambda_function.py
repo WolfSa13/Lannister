@@ -90,17 +90,20 @@ def lambda_handler(event, context):
     elif action_id.startswith('bonus_delete'):
         bonus_id = int(action_id.split('_')[2])
 
-        bonus_list = TypeBonusesQuery.delete_bonuses(bonus_id)
+        bonus_deleted = TypeBonusesQuery.delete_bonuses(bonus_id)
 
-        attachments = generate_bonus_block_list(bonus_list)
+        blocks = [error_message]
+
+        if bonus_deleted:
+            blocks = [bonus_deleted_successfully]
 
         data = {
-            "response_type": 'in_channel',
-            "replace_original": True,
-            "attachments": attachments
+            'token': SLACK_BOT_TOKEN,
+            'channel': event['user']['id'],
+            "blocks": blocks
         }
 
-        response_url = event['response_url']
+        response_url = 'https://slack.com/api/chat.postMessage'
 
         headers = {
             'Content-type': 'application/json',
@@ -130,9 +133,12 @@ def lambda_handler(event, context):
             'description': bonus_description
         }
 
-        TypeBonusesQuery.add_new_bonus(data)
+        bonus_created = TypeBonusesQuery.add_new_bonus(data)
 
-        blocks = [bonus_created_successfully(bonus_name), bonus_start_menu[0]]
+        blocks = [error_message]
+
+        if bonus_created:
+            blocks = [bonus_created_successfully(bonus_name)]
 
         data = {
             'token': SLACK_BOT_TOKEN,
@@ -166,9 +172,12 @@ def lambda_handler(event, context):
             'description': bonus_description
         }
 
-        TypeBonusesQuery.update_bonuses(bonus_id, data)
+        bonus_updated = TypeBonusesQuery.update_bonuses(bonus_id, data)
 
-        blocks = [bonus_edited_successfully, bonus_start_menu[0]]
+        blocks = [error_message]
+
+        if bonus_updated:
+            blocks = [bonus_edited_successfully]
 
         data = {
             'token': SLACK_BOT_TOKEN,

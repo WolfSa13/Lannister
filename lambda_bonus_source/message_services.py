@@ -80,6 +80,22 @@ def bonus_created_successfully(name):
     }
 
 
+bonus_deleted_successfully = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": f"Bonus was deleted successfully"
+    }
+}
+
+error_message = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": f"An error occurred. Are You sure, that You've done right action? When yes, try again!"
+    }
+}
+
 bonus_start_menu = [
     {
         "type": "header",
