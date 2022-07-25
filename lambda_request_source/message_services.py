@@ -1,6 +1,8 @@
 from orm_services import UsersQuery, TypeBonusesQuery
 from datetime import date
 
+from time_utils import datetime_converter, date_converter
+
 request_start_menu = [
     {
         "type": "header",
@@ -258,7 +260,8 @@ def generate_request_block_list(request_list):
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"*Creation date:* {request['created_at']}\n*Payment date:* {payment_date}"
+                            "text": f"*Creation date:* {datetime_converter(request['created_at'])}\n"
+                                    f"*Payment date:* {date_converter(payment_date)}"
                         }
                     ]
                 },
@@ -390,7 +393,7 @@ def generate_request_history_block_list(request_history_list):
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*When:* {request_history_event.timestamp}"
+                            "text": f"*When:* {datetime_converter(request_history_event.timestamp)}"
                         }
                     ]
                 },

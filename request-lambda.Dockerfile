@@ -3,6 +3,7 @@ FROM amazon/aws-lambda-python:3.8
 COPY ./lambda_request_source/lambda_function.py ${LAMBDA_TASK_ROOT}
 COPY ./lambda_request_source/message_services.py ${LAMBDA_TASK_ROOT}
 COPY ./lambda_request_source/orm_services.py ${LAMBDA_TASK_ROOT}
+COPY ./lambda_request_source/time_utils.py ${LAMBDA_TASK_ROOT}
 COPY ./models/models.py ${LAMBDA_TASK_ROOT}
 
 COPY ./lambda_request_source/requirements.txt .

@@ -91,8 +91,8 @@ class Request(Base):
 class RequestHistory(Base):
     __tablename__ = "requests_history"
     id = Column(Integer, primary_key=True)
-    changes = Column(String(200), nullable=False, default='created')
-    timestamp = Column(DateTime, server_default=func.now())
+    changes = Column(String(300), nullable=False, default='created')
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
     editor = Column(String(50), nullable=False)
 
     request_id = Column(Integer, ForeignKey('requests.id'))
