@@ -1,0 +1,77 @@
+service: mvp
+useDotenv: true
+
+plugins:
+  - serverless-iam-roles-per-function
+
+provider:
+  name: aws
+  profile: commonAccount
+  stage: dev
+  region: ${env:REGION}
+  ecr:
+    images:
+      lambda-request-image:
+        path: .
+        file: request-lambda.Dockerfile
+      lambda-bonus-image:
+        path: .
+        file: bonus-lambda.Dockerfile
+      lambda-worker-image:
+        path: .
+        file: worker-lambda.Dockerfile
+      lambda-api_gateway-image:
+        path: ./lambda_api_gateway_source
+
+
+functions:
+  api_gateway-lambda:
+    image:
+      name: lambda-api_gateway-image
+    url: true
+    environment:
+        REGION: ${env:REGION}
+        ACCOUNT: ${env:ACCOUNT}
+        WORKER_LAMBDA: ${env:WORKER_LAMBDA}
+        BONUS_LAMBDA: ${env:BONUS_LAMBDA}
+        REQUEST_LAMBDA: ${env:REQUEST_LAMBDA}
+    iamRoleStatementsName: invoke-another-lambda
+    iamRoleStatements:
+        - Effect: "Allow"
+          Action:
+            - lambda:InvokeFunction
+            - lambda:InvokeAsync
+          Resource: "arn:aws:lambda:${env:REGION}:${env:ACCOUNT}:function:*"
+
+  request-lambda:
+    image:
+      name: lambda-request-image
+    environment:
+      POSTGRES_USER: ${env:POSTGRES_USER}
+      POSTGRES_PASSWORD: ${env:POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${env:POSTGRES_HOST}
+      POSTGRES_PORT: ${env:POSTGRES_PORT}
+      POSTGRES_DB: ${env:POSTGRES_DB}
+      SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+
+  worker-lambda:
+    image:
+      name: lambda-worker-image
+    environment:
+      POSTGRES_USER: ${env:POSTGRES_USER}
+      POSTGRES_PASSWORD: ${env:POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${env:POSTGRES_HOST}
+      POSTGRES_PORT: ${env:POSTGRES_PORT}
+      POSTGRES_DB: ${env:POSTGRES_DB}
+      SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+
+  bonus-lambda:
+    image:
+      name: lambda-bonus-image
+    environment:
+      POSTGRES_USER: ${env:POSTGRES_USER}
+      POSTGRES_PASSWORD: ${env:POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${env:POSTGRES_HOST}
+      POSTGRES_PORT: ${env:POSTGRES_PORT}
+      POSTGRES_DB: ${env:POSTGRES_DB}
+      SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}

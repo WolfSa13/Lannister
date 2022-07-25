@@ -1,3 +1,66 @@
+def get_bonus_by_id(bonus_id, bonus_list):
+    for bonus in bonus_list:
+        if bonus['id'] == bonus_id:
+            return bonus
+
+    return None
+
+
+def generate_bonus_block_list(bonus_list):
+    attachments = []
+
+    for bonus in bonus_list:
+        bonus_item = {
+            "color": "#008000",
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": bonus['type']
+                    }
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Description:* {bonus['description']}"
+                        }
+                    ]
+                },
+                {
+                    "type": "actions",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Edit"
+                            },
+                            "action_id": f"bonus_edit_{bonus['id']}"
+                        },
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Delete"
+                            },
+                            "style": "danger",
+                            "action_id": f"bonus_delete_{bonus['id']}"
+                        }
+                    ]
+                }
+            ]
+        }
+
+        attachments.append(bonus_item)
+
+    attachments.append(back_to_bonus_start_menu_button)
+
+    return attachments
+
+
 bonus_edited_successfully = {
     "type": "section",
     "text": {
@@ -17,7 +80,33 @@ def bonus_created_successfully(name):
     }
 
 
+bonus_deleted_successfully = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": f"Bonus was deleted successfully"
+    }
+}
+
+error_message = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": f"An error occurred. Are You sure, that You've done right action? When yes, try again!"
+    }
+}
+
 bonus_start_menu = [
+    {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Bonuses"
+        }
+    },
+    {
+        "type": "divider"
+    },
     {
         "type": "actions",
         "elements": [
@@ -112,7 +201,7 @@ bonus_create_modal = {
 }
 
 
-def bonus_edit_modal(bonus_id, name, description):
+def bonus_edit_modal(bonus):
     return {
         "title": {
             "type": "plain_text",
@@ -124,7 +213,7 @@ def bonus_edit_modal(bonus_id, name, description):
 
         },
         "type": "modal",
-        "callback_id": "bonus_modal_edit_" + str(bonus_id),
+        "callback_id": f"bonus_modal_edit_{bonus['id']}",
         "close": {
             "type": "plain_text",
             "text": "Cancel"
@@ -139,7 +228,7 @@ def bonus_edit_modal(bonus_id, name, description):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "bonus_name_input",
-                    "initial_value": name
+                    "initial_value": bonus['type']
                 },
             },
             {
@@ -151,7 +240,7 @@ def bonus_edit_modal(bonus_id, name, description):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "bonus_description_input",
-                    "initial_value": description,
+                    "initial_value": bonus['description'],
                     "multiline": True
                 }
             }

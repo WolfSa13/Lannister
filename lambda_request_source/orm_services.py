@@ -3,6 +3,8 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import ColumnElement as ColElem
 import os
 
+from models import RequestHistory, Request
+
 POSTGRES_USER = os.environ.get('POSTGRES_USER')
 POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
 POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
@@ -29,7 +31,9 @@ class RequestQuery:
             reviewer = db.orm.aliased(Users)
             query = session.query(Requests, ColElem.label(TypeBonuses.c.type, 'bonus_name'),
                                   ColElem.label(creator.c.full_name, 'creator_name'),
-                                  ColElem.label(reviewer.c.full_name, 'reviewer_name')).order_by(Requests.columns.id)
+                                  ColElem.label(creator.c.slack_id, 'creator_slack_id'),
+                                  ColElem.label(reviewer.c.full_name, 'reviewer_name'),
+                                  ColElem.label(reviewer.c.slack_id, 'reviewer_slack_id')).order_by(Requests.columns.id)
             if request_id is not None:
                 query = query.filter(Requests.columns.id == request_id)
 
@@ -37,37 +41,21 @@ class RequestQuery:
                 .join(creator, Requests.c.creator == creator.c.id) \
                 .join(reviewer, Requests.c.reviewer == reviewer.c.id).all()
 
-            result = []
-            for request in query_result:
-                result.append(
-                    {
-                        'id': request[0],
-                        'creator': request[1],
-                        'status': request[2],
-                        'reviewer': request[3],
-                        'type_bonus': request[4],
-                        'created_at': request[5],
-                        'updated_at': request[6],
-                        'payment_date': request[7],
-                        'payment_amount': request[8],
-                        'description': request[9],
-                        'bonus_name': request[10],
-                        'creator_name': request[11],
-                        'reviewer_name': request[12],
-                    }
-                )
-
-        return result
+        return query_result
 
     @staticmethod
     def update_request(request_id, data):
         with Session(engine) as session:
-            query = session.query(Requests).filter(Requests.columns.id == request_id)
-            query_result = query.update(data)
+            try:
+                query = session.query(Requests).filter(Requests.columns.id == request_id)
+                query.update(data)
+                session.commit()
+            except db.exc.SQLAlchemyError as e:
+                session.rollback()
+                return 0
 
-            session.commit()
+        return 1
 
-        return query_result
 
     @staticmethod
     def delete_request(request_id):
@@ -87,18 +75,17 @@ class RequestQuery:
     def add_new_request(data):
         with Session(engine) as session:
             try:
-                insert = Requests.insert() \
-                    .values(creator=data['creator'], reviewer=data['reviewer'], status='created',
-                            type_bonus=data['type_bonus'],
-                            payment_amount=data['payment_amount'], description=data['description'])
+                new_request = Request(**data)
+                session.add(new_request)
+                session.flush()
+                create_request_id = new_request.id
 
-                session.execute(insert)
                 session.commit()
             except db.exc.SQLAlchemyError as e:
                 session.rollback()
                 return 0
 
-        return 1
+        return create_request_id
 
     @staticmethod
     def get_filtered_requests(status=None, reviewer_id=None, creator_id=None, payment_date=None):
@@ -206,4 +193,42 @@ class TypeBonusesQuery:
         for item in bonuses_data:
             parsed_result.append(dict(item))
 
-        return  parsed_result
+        return parsed_result
+
+
+class RequestHistoryQuery:
+    @staticmethod
+    def get_request_history(request_id):
+        with Session(engine) as session:
+            query = session.query(RequestHistory).filter(RequestHistory.request_id == request_id)
+
+            query_result = query.all()
+
+        return query_result
+
+    @staticmethod
+    def add_history(data, request_id, editor, old_request=None):
+        with Session(engine) as session:
+            try:
+                if old_request is not None:
+                    request = dict(old_request)
+                else:
+                    request = dict()
+
+                changes_log = ''
+                for key in data.keys():
+                    if str(data[key]) != str(request.get(key, "-")):
+                        if key == 'reviewer' or key == 'type_bonus' or key == 'creator':
+                            continue
+
+                        log = f'{" ".join(key.split("_")).capitalize()}:  {request.get(key, "-")}  ->  {data[key]}\n'
+                        changes_log += log
+
+                new_history = RequestHistory(request_id=request_id, changes=changes_log, editor=editor)
+                session.add(new_history)
+
+                session.commit()
+            except db.exc.SQLAlchemyError as e:
+                session.rollback()
+                return 0
+        return 1

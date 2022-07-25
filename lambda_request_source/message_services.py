@@ -1,16 +1,224 @@
-from const import back_to_request_start_menu_button
 from orm_services import UsersQuery, TypeBonusesQuery
-import datetime
+from datetime import date
+
+from time_utils import datetime_converter, date_converter
+
+request_start_menu = [
+    {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Requests"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
+        "type": "actions",
+        "elements": [
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Request list"
+                },
+                "action_id": "request_list"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Create request"
+                },
+                "action_id": "request_create"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Return to main menu"
+                },
+                "action_id": "start"
+            }
+        ]
+    }
+]
+
+back_to_request_start_menu_button = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": "request_start_menu"
+                }
+            ]
+        }
+    ]
+}
+
+start_menu = [
+    {
+        "type": "section",
+        "text": {
+            "type": "plain_text",
+            "text": "Hi, I'm here. What do you want to do?"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
+        "type": "actions",
+        "elements": [
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Workers"
+                },
+                "action_id": "worker_start_menu"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Requests"
+                },
+                "action_id": "request_start_menu"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Bonuses"
+                },
+                "action_id": "bonus_start_menu"
+            }
+        ]
+    }
+]
+
+
+def request_created_successfully_reviewer(creator_name):
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": f"{creator_name} created a request, and set You as a reviewer."
+            }
+        }
+    ]
+
+
+def request_created_successfully():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request was created successfully"
+            }
+        }
+    ]
+
+
+def request_not_created():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request wasn't created. Try again"
+            }
+        }
+    ]
+
+
+def request_edited_successfully():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request was edited successfully"
+            }
+        }
+    ]
+
+
+def request_change_successfully(request_id):
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": f"Request #{request_id} was changed."
+            }
+        }
+    ]
+
+
+def request_error_edit():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request wasn't edited successfully. Try again"
+            }
+        }
+    ]
+
+
+def request_deleted_successfully():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request was deleted successfully"
+            }
+        }
+    ]
+
+
+def request_approved_successfully():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request was approved successfully"
+            }
+        }
+    ]
+
+
+def request_denied_successfully():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request was denied successfully"
+            }
+        }
+    ]
 
 
 def generate_request_block_list(request_list):
     attachments = []
 
     for request in request_list:
-
-        updated_at = request['updated_at']
-        if not updated_at:
-            updated_at = "Wasn't updated yet."
 
         payment_date = request['payment_date']
         if not payment_date:
@@ -52,7 +260,8 @@ def generate_request_block_list(request_list):
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"*Creation date:* {request['created_at']}\n*Payment date:* {payment_date}\n*Last changed:* {updated_at}"
+                            "text": f"*Creation date:* {datetime_converter(request['created_at'])}\n"
+                                    f"*Payment date:* {date_converter(payment_date)}"
                         }
                     ]
                 },
@@ -68,6 +277,32 @@ def generate_request_block_list(request_list):
                 {
                     "type": "actions",
                     "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Changes history"
+                            },
+                            "action_id": f"request_history_{request['id']}"
+                        },
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Approve"
+                            },
+                            "style": "primary",
+                            "action_id": f"request_status_approve_{request['id']}"
+                        },
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Deny"
+                            },
+                            "style": "danger",
+                            "action_id": f"request_status_deny_{request['id']}"
+                        },
                         {
                             "type": "button",
                             "text": {
@@ -92,6 +327,89 @@ def generate_request_block_list(request_list):
         attachments.append(request_item)
 
     attachments.append(back_to_request_start_menu_button)
+
+    return attachments
+
+
+def request_history_string(request_id):
+    return {
+        "color": "#008000",
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": f"History of request #{request_id}"
+                }
+            }
+        ]
+    }
+
+
+back_to_request_list_button = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": "request_list"
+                }
+            ]
+        }
+    ]
+}
+
+
+def generate_request_history_block_list(request_history_list):
+    """
+    request_history_list = [
+            {
+                'id': 1,
+                'request_id': 1,
+                'timestamp': '24-07-2022 14:22',
+                'editor': 'Name',
+                'changes': 'abc'
+            }
+        ]
+    """
+    attachments = [request_history_string(request_history_list[0].request_id)]
+
+    for request_history_event in request_history_list:
+        request_history_item = {
+            "color": "#09ab19",
+            "blocks": [
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Editor:* {request_history_event.editor}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*When:* {datetime_converter(request_history_event.timestamp)}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*Changes:*\n{request_history_event.changes}"
+                    }
+                }
+            ]
+        }
+
+        attachments.append(request_history_item)
+
+    attachments.append(back_to_request_list_button)
 
     return attachments
 
@@ -186,6 +504,18 @@ def request_create_modal():
                 "label": {
                     "type": "plain_text",
                     "text": "Payment amount"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Pick a payment date:*"
+                },
+                "accessory": {
+                    "type": "datepicker",
+                    "initial_date": str(date.today()),
+                    "action_id": "request_date_input"
                 }
             },
             {
@@ -311,6 +641,18 @@ def request_edit_modal(request):
                 "label": {
                     "type": "plain_text",
                     "text": "Payment amount"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Pick a payment date:*"
+                },
+                "accessory": {
+                    "type": "datepicker",
+                    "initial_date": str(request['payment_date']),
+                    "action_id": "request_date_input"
                 }
             },
             {

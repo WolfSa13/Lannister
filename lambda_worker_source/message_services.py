@@ -1,3 +1,27 @@
+roles_options = [
+    {
+        "text": {
+            "type": "mrkdwn",
+            "text": "worker"
+        },
+        "value": "1"
+    },
+    {
+        "text": {
+            "type": "mrkdwn",
+            "text": "reviewer"
+        },
+        "value": "2"
+    },
+    {
+        "text": {
+            "type": "mrkdwn",
+            "text": "administrator"
+        },
+        "value": "3"
+    }
+]
+
 def get_user_by_id(user_id, users_list):
     for user in users_list:
         if user['id'] == int(user_id):
@@ -11,7 +35,7 @@ def generate_user_block_list(user_list):
 
     for user in user_list:
         user_item = {
-            "color": "#854845",
+            "color": "#008000",
             "blocks": [
                 {
                     "type": "header",
@@ -25,16 +49,11 @@ def generate_user_block_list(user_list):
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"Position: {user['position']}"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "fields": [
+                            "text": f"*Position:* {user['position']}"
+                        },
                         {
                             "type": "mrkdwn",
-                            "text": f"Roles: {user['roles']}"
+                            "text": f"*Roles:* {', '.join(user['roles'])}"
                         }
                     ]
                 },
@@ -47,7 +66,7 @@ def generate_user_block_list(user_list):
                                 "type": "plain_text",
                                 "text": "Edit"
                             },
-                            "action_id": "worker_edit_" + str(user['id'])
+                            "action_id": f"worker_edit_{user['id']}"
                         },
                         {
                             "type": "button",
@@ -56,7 +75,7 @@ def generate_user_block_list(user_list):
                                 "text": "Delete"
                             },
                             "style": "danger",
-                            "action_id": "worker_delete_" + str(user['id'])
+                            "action_id": f"worker_delete_{user['id']}"
                         }
                     ]
                 }
@@ -135,12 +154,19 @@ worker_create_modal = {
 
 
 def initial_role_block(role):
+    if role == 'worker':
+        value = '1'
+    elif role == 'reviewer':
+        value = '2'
+    elif role == 'administrator':
+        value = '3'
+
     return {
         "text": {
             "type": "mrkdwn",
             "text": role
         },
-        "value": role
+        "value": value
     }
 
 
@@ -152,18 +178,18 @@ def worker_edit_modal(user):
     return {
         "title": {
             "type": "plain_text",
-            "text": "Create new user"
+            "text": "Edit worker"
         },
         "submit": {
             "type": "plain_text",
-            "text": "Create"
+            "text": "Submit"
         },
-        "type": "modal",
-        "callback_id": "worker_modal_edit_" + str(user['id']),
         "close": {
             "type": "plain_text",
             "text": "Cancel"
         },
+        "type": "modal",
+        "callback_id": "worker_modal_edit_" + str(user['id']),
         "blocks": [
             {
                 "type": "input",
@@ -217,29 +243,52 @@ def worker_edit_modal(user):
         ]
     }
 
-def user_created_successfully(data):
+error_message = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": "Operation is unsuccessful. Try again."
+    }
+}
+
+
+def user_created_successfully(full_name):
     return {
         "type": "section",
         "text": {
             "type": "plain_text",
-            "text": f"{data['full_name']}, {data['position']}, {data['roles']}, {data['slack_id']}"
-            # "text": f"User {data['full_name']} was created successfulyy"
+             "text": f"User {full_name} was created successfuly."
         }
     }
 
 
-def user_edited_successfully(data):
-    return {
-        "type": "section",
-        "text": {
-            "type": "plain_text",
-            "text": f"{data['full_name']}, {data['position']}, {data['roles']}, {data['slack_id']}"
-            # "text": f"User {data['full_name']} was edited successfulyy"
-        }
+user_edited_successfully = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": "User was edited successfully"
     }
+}
 
+user_deleted_successfully = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": "User was deleted successfully"
+    }
+}
 
 user_start_menu = [
+    {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Workers"
+        }
+    },
+    {
+        "type": "divider"
+    },
     {
         "type": "actions",
         "elements": [
@@ -247,7 +296,7 @@ user_start_menu = [
                 "type": "button",
                 "text": {
                     "type": "plain_text",
-                    "text": "Users List"
+                    "text": "Workers List"
                 },
                 "action_id": "worker_list"
             },
@@ -255,7 +304,7 @@ user_start_menu = [
                 "type": "button",
                 "text": {
                     "type": "plain_text",
-                    "text": "Create user"
+                    "text": "Create worker"
                 },
                 "action_id": "worker_create"
             },
@@ -290,26 +339,11 @@ back_to_user_start_menu_button = {
     ]
 }
 
-roles_options = [
-    {
-        "text": {
-            "type": "mrkdwn",
-            "text": "worker"
-        },
-        "value": "worker"
-    },
-    {
-        "text": {
-            "type": "mrkdwn",
-            "text": "reviewer"
-        },
-        "value": "reviewer"
-    },
-    {
-        "text": {
-            "type": "mrkdwn",
-            "text": "administrator"
-        },
-        "value": "administrator"
-    }
-]
+
+def check_if_cpp_dev(position):
+    if 'c++' in position:
+        return position.replace('c++', 'cpp').replace('+', ' ').replace('cpp', 'c++')
+    elif 'C++' in position:
+        return position.replace('C++', 'Cpp').replace('+', ' ').replace('Cpp', 'C++')
+
+    return position.replace('+', ' ')

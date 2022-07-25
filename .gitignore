@@ -109,9 +109,9 @@ celerybeat.pid
 # Environments
 .env
 .venv
-env/
+.env/
 venv/
-ENV/
+.env/
 env.bak/
 venv.bak/
 
@@ -138,4 +138,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+node_modules/
+package-lock.json
+.serverless/
 
