@@ -279,14 +279,12 @@ def generate_request_history_block_list(request_history_list):
                 'id': 1,
                 'request_id': 1,
                 'timestamp': '24-07-2022 14:22',
-                'editor_id': 1,
-                'editor_name': 'Name',
+                'editor': 'Name',
                 'changes': 'abc'
             }
         ]
     """
-
-    attachments = [request_history_string(request_history_list[0]['request_id'])]
+    attachments = [request_history_string(request_history_list[0].request_id)]
 
     for request_history_event in request_history_list:
         request_history_item = {
@@ -297,11 +295,11 @@ def generate_request_history_block_list(request_history_list):
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"*Editor:* {request_history_event['editor_name']}"
+                            "text": f"*Editor:* {request_history_event.editor}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*When:* {request_history_event['timestamp']}"
+                            "text": f"*When:* {request_history_event.timestamp}"
                         }
                     ]
                 },
@@ -309,7 +307,7 @@ def generate_request_history_block_list(request_history_list):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"*Changes:* {request_history_event['changes']}"
+                        "text": f"*Changes:*\n{request_history_event.changes}"
                     }
                 }
             ]
