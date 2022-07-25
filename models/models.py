@@ -14,7 +14,7 @@ class User(Base):
 
     users_roles = relationship("UsersRolesRelation", back_populates='user')
 
-    def __init__(self, full_name, position, slack_id):
+    def __init__(self, full_name, slack_id, position=''):
         self.full_name = full_name
         self.position = position
         self.slack_id = slack_id
