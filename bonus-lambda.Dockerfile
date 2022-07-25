@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/python:3.8
+FROM amazon/aws-lambda-python:3.8
 
 COPY ./lambda_bonus_source/lambda_function.py ${LAMBDA_TASK_ROOT}
 COPY ./lambda_bonus_source/message_services.py ${LAMBDA_TASK_ROOT}

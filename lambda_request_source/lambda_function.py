@@ -3,7 +3,7 @@ import requests
 import os
 
 from message_services import *
-from orm_services import RequestQuery, UsersQuery
+from orm_services import RequestQuery, UsersQuery, RequestHistoryQuery
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 
@@ -85,34 +85,7 @@ def lambda_handler(event, context):
     elif action_id.startswith('request_history_'):
         request_id = int(action_id.split('_')[2])
 
-        # request_history_list = query_to_get_history_requests(request_id)
-
-        request_history_list = [
-            {
-                'id': 1,
-                'request_id': request_id,
-                'timestamp': '24-07-2022 14:22',
-                'editor_id': 1,
-                'editor_name': 'Vova',
-                'changes': 'abc'
-            },
-            {
-                'id': 2,
-                'request_id': request_id,
-                'timestamp': '23-07-2022 13:22',
-                'editor_id': 1,
-                'editor_name': 'Vitalik',
-                'changes': 'abc'
-            },
-            {
-                'id': 3,
-                'request_id': request_id,
-                'timestamp': '22-07-2022 20:22',
-                'editor_id': 1,
-                'editor_name': 'Mariana',
-                'changes': 'abc'
-            },
-        ]
+        request_history_list = RequestHistoryQuery.get_request_history(request_id=request_id)
 
         attachments = generate_request_history_block_list(request_history_list)
 
@@ -155,17 +128,24 @@ def lambda_handler(event, context):
 
     elif action_id.startswith('request_modal_create'):
         creator_slack_id = event['body']['user']['id']
-        creator_id = UsersQuery.get_user_by_slack_id(creator_slack_id)['id']
+        creator = UsersQuery.get_user_by_slack_id(creator_slack_id)
+        creator_id = creator['id']
 
         reviewer_block_id = event['body']['view']['blocks'][0]['block_id']
         reviewer_id = \
             event['body']['view']['state']['values'][reviewer_block_id]['static_select-action']['selected_option'][
                 'value']
+        reviewer_name = \
+            event['body']['view']['state']['values'][reviewer_block_id]['static_select-action']['selected_option'][
+                'text']['text']
 
         bonus_type_block_id = event['body']['view']['blocks'][1]['block_id']
         bonus_type_id = \
             event['body']['view']['state']['values'][bonus_type_block_id]['static_select-action']['selected_option'][
                 'value']
+        bonus_type_name = \
+            event['body']['view']['state']['values'][bonus_type_block_id]['static_select-action']['selected_option'][
+                'text']['text']
 
         payment_amount_block_id = event['body']['view']['blocks'][2]['block_id']
         payment_amount = event['body']['view']['state']['values'][payment_amount_block_id]['request_amount_input'][
@@ -177,12 +157,29 @@ def lambda_handler(event, context):
         description = description.replace('+', ' ')
 
         data = {
-            'creator': creator_id,
-            'reviewer': reviewer_id,
-            'type_bonus': bonus_type_id,
-            'payment_amount': payment_amount,
+            'creator': int(creator_id),
+            'reviewer': int(reviewer_id),
+            'type_bonus': int(bonus_type_id),
+            'payment_amount': int(payment_amount),
             'description': description,
+            'status': 'created'
         }
+
+        result = RequestQuery.add_new_request(data)
+
+        if result != 0:
+            data['reviewer_name'] = reviewer_name.replace('+', ' ')
+            data['bonus_name'] = bonus_type_name.replace('+', ' ')
+            RequestHistoryQuery.add_history(data, request_id=result, editor=creator['full_name'])
+
+        blocks = request_created_successfully()
+
+        data = {
+            'token': SLACK_BOT_TOKEN,
+            'channel': creator_slack_id,
+            "blocks": blocks
+        }
+
 
         response_url = 'https://slack.com/api/chat.postMessage'
 
@@ -226,18 +223,25 @@ def lambda_handler(event, context):
 
     elif action_id.startswith('request_modal_edit'):
         request_id = int(action_id.split('_')[3])
+
         editor_slack_id = event['body']['user']['id']
-        editor_id = UsersQuery.get_user_by_slack_id(editor_slack_id)['id']
+        creator = UsersQuery.get_user_by_slack_id(editor_slack_id)
 
         reviewer_block_id = event['body']['view']['blocks'][0]['block_id']
         reviewer_id = \
             event['body']['view']['state']['values'][reviewer_block_id]['static_select-action']['selected_option'][
                 'value']
+        reviewer_name = \
+            event['body']['view']['state']['values'][reviewer_block_id]['static_select-action']['selected_option'][
+                'text']['text']
 
         bonus_type_block_id = event['body']['view']['blocks'][1]['block_id']
         bonus_type_id = \
             event['body']['view']['state']['values'][bonus_type_block_id]['static_select-action']['selected_option'][
                 'value']
+        bonus_type_name = \
+            event['body']['view']['state']['values'][bonus_type_block_id]['static_select-action']['selected_option'][
+                'text']['text']
 
         payment_amount_block_id = event['body']['view']['blocks'][2]['block_id']
         payment_amount = event['body']['view']['state']['values'][payment_amount_block_id]['request_amount_input'][
@@ -249,10 +253,26 @@ def lambda_handler(event, context):
         description = description.replace('+', ' ')
 
         data = {
-            'reviewer': reviewer_id,
-            'type_bonus': bonus_type_id,
-            'payment_amount': payment_amount,
-            'description': description,
+            'reviewer': int(reviewer_id),
+            'type_bonus': int(bonus_type_id),
+            'payment_amount': int(payment_amount),
+            'description': description
+        }
+        old_request = RequestQuery.get_requests(request_id=request_id)[0]
+        result = RequestQuery.update_request(request_id, data)
+
+        if result != 0:
+            data['reviewer_name'] = reviewer_name.replace('+', ' ')
+            data['bonus_name'] = bonus_type_name.replace('+', ' ')
+            RequestHistoryQuery.add_history(data, request_id=request_id, editor=creator['full_name'],
+                                            old_request=old_request)
+
+        blocks = request_edited_successfully()
+
+        data = {
+            'token': SLACK_BOT_TOKEN,
+            'channel': editor_slack_id,
+            'blocks': blocks
         }
 
         response_url = 'https://slack.com/api/chat.postMessage'

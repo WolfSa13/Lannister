@@ -3,6 +3,8 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import ColumnElement as ColElem
 import os
 
+from models import RequestHistory, Request
+
 POSTGRES_USER = os.environ.get('POSTGRES_USER')
 POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
 POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
@@ -73,18 +75,17 @@ class RequestQuery:
     def add_new_request(data):
         with Session(engine) as session:
             try:
-                insert = Requests.insert() \
-                    .values(creator=data['creator'], reviewer=data['reviewer'], status='created',
-                            type_bonus=data['type_bonus'],
-                            payment_amount=data['payment_amount'], description=data['description'])
+                new_request = Request(**data)
+                session.add(new_request)
+                session.flush()
+                create_request_id = new_request.id
 
-                session.execute(insert)
                 session.commit()
             except db.exc.SQLAlchemyError as e:
                 session.rollback()
                 return 0
 
-        return 1
+        return create_request_id
 
     @staticmethod
     def get_filtered_requests(status=None, reviewer_id=None, creator_id=None, payment_date=None):
@@ -192,4 +193,42 @@ class TypeBonusesQuery:
         for item in bonuses_data:
             parsed_result.append(dict(item))
 
-        return  parsed_result
+        return parsed_result
+
+
+class RequestHistoryQuery:
+    @staticmethod
+    def get_request_history(request_id):
+        with Session(engine) as session:
+            query = session.query(RequestHistory).filter(RequestHistory.request_id == request_id)
+
+            query_result = query.all()
+
+        return query_result
+
+    @staticmethod
+    def add_history(data, request_id, editor, old_request=None):
+        with Session(engine) as session:
+            try:
+                if old_request is not None:
+                    request = dict(old_request)
+                else:
+                    request = dict()
+
+                changes_log = ''
+                for key in data.keys():
+                    if data[key] != request.get(key, "-"):
+                        if key == 'reviewer' or key == 'type_bonus' or key == 'creator':
+                            continue
+
+                        log = f'{" ".join(key.split("_")).capitalize()}:  {request.get(key, "-")}  ->  {data[key]}\n'
+                        changes_log += log
+
+                new_history = RequestHistory(request_id=request_id, changes=changes_log, editor=editor)
+                session.add(new_history)
+
+                session.commit()
+            except db.exc.SQLAlchemyError as e:
+                session.rollback()
+                return 0
+        return 1
