@@ -1,4 +1,5 @@
 from orm_services import UsersQuery, TypeBonusesQuery
+from datetime import date
 
 request_start_menu = [
     {
@@ -139,13 +140,14 @@ def request_edited_successfully():
         }
     ]
 
-def request_change_successfully(requist_id):
+
+def request_change_successfully(request_id):
     return [
         {
             "type": "section",
             "text": {
                 "type": "plain_text",
-                "text": f"Request #{requist_id} was changed."
+                "text": f"Request #{request_id} was changed."
             }
         }
     ]
@@ -448,6 +450,18 @@ def request_create_modal():
                 }
             },
             {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Pick a payment date:*"
+                },
+                "accessory": {
+                    "type": "datepicker",
+                    "initial_date": str(date.today()),
+                    "action_id": "request_date_input"
+                }
+            },
+            {
                 "type": "input",
                 "element": {
                     "type": "plain_text_input",
@@ -570,6 +584,18 @@ def request_edit_modal(request):
                 "label": {
                     "type": "plain_text",
                     "text": "Payment amount"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Pick a payment date:*"
+                },
+                "accessory": {
+                    "type": "datepicker",
+                    "initial_date": str(request['payment_date']),
+                    "action_id": "request_date_input"
                 }
             },
             {

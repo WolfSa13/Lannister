@@ -150,11 +150,7 @@ def lambda_handler(event, context):
         selected_options = event['body']['view']['state']['values'][roles_block_id]['worker_roles_input'][
             'selected_options']
 
-        print(f'selected options {selected_options}')
-
         for option in selected_options:
-            print(option)
-            print(f"roles.append(int({option['value']}))")
             roles.append(int(option['value']))
 
         slack_id_block_id = event['body']['view']['blocks'][3]['block_id']

@@ -127,6 +127,9 @@ def lambda_handler(event, context):
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('request_modal_create'):
+
+        print(event)
+
         creator_slack_id = event['body']['user']['id']
         creator = UsersQuery.get_user_by_slack_id(creator_slack_id)
         creator_id = creator['id']
@@ -151,7 +154,14 @@ def lambda_handler(event, context):
         payment_amount = event['body']['view']['state']['values'][payment_amount_block_id]['request_amount_input'][
             'value']
 
-        description_block_id = event['body']['view']['blocks'][3]['block_id']
+        payment_date_block_id = event['body']['view']['blocks'][3]['block_id']
+        print(payment_date_block_id)
+
+        payment_date = event['body']['view']['state']['values'][payment_date_block_id]['request_date_input'][
+            'selected_date']
+        print(payment_date)
+
+        description_block_id = event['body']['view']['blocks'][4]['block_id']
         description = event['body']['view']['state']['values'][description_block_id]['request_description_input'][
             'value']
         description = description.replace('+', ' ')
@@ -161,9 +171,11 @@ def lambda_handler(event, context):
             'reviewer': int(reviewer_id),
             'type_bonus': int(bonus_type_id),
             'payment_amount': int(payment_amount),
+            'payment_date': str(payment_date),
             'description': description,
             'status': 'created'
         }
+        print(data)
 
         result = RequestQuery.add_new_request(data)
 
@@ -213,6 +225,8 @@ def lambda_handler(event, context):
     elif action_id.startswith('request_modal_edit'):
         request_id = int(action_id.split('_')[3])
 
+        print(event)
+
         editor_slack_id = event['body']['user']['id']
         creator = UsersQuery.get_user_by_slack_id(editor_slack_id)
 
@@ -236,22 +250,29 @@ def lambda_handler(event, context):
         payment_amount = event['body']['view']['state']['values'][payment_amount_block_id]['request_amount_input'][
             'value']
 
-        description_block_id = event['body']['view']['blocks'][3]['block_id']
+        payment_date_block_id = event['body']['view']['blocks'][3]['block_id']
+        print(payment_date_block_id)
+
+        payment_date = event['body']['view']['state']['values'][payment_date_block_id]['request_date_input'][
+            'selected_date']
+        print(payment_date)
+
+        description_block_id = event['body']['view']['blocks'][4]['block_id']
         description = event['body']['view']['state']['values'][description_block_id]['request_description_input'][
             'value']
         description = description.replace('+', ' ')
-
-        print(payment_amount, type(payment_amount))
 
         data = {
             'reviewer': int(reviewer_id),
             'type_bonus': int(bonus_type_id),
             'payment_amount': int(payment_amount),
+            'payment_date': str(payment_date),
             'description': description
         }
+        print(data)
+
         old_request = RequestQuery.get_requests(request_id=request_id)[0]
         result = RequestQuery.update_request(request_id, data)
-        print(result)
 
         if result != 0:
             data['reviewer_name'] = reviewer_name.replace('+', ' ')
@@ -283,8 +304,8 @@ def lambda_handler(event, context):
             request = RequestQuery.get_requests(request_id)[0]
 
             if editor_slack_id == request['creator_slack_id']:
-                  data_information_massage['channel'] = request['reviewer_slack_id']
-                  data_editor_massage['channel'] = request['creator_slack_id']
+                data_information_massage['channel'] = request['reviewer_slack_id']
+                data_editor_massage['channel'] = request['creator_slack_id']
             elif editor_slack_id == request['reviewer_slack_id']:
                 data_information_massage['channel'] = request['creator_slack_id']
                 data_editor_massage['channel'] = request['reviewer_slack_id']
@@ -302,7 +323,3 @@ def lambda_handler(event, context):
                 'blocks': blocks
             }
             requests.post(response_url, data=json.dumps(data_error_message), headers=headers)
-
-
-
-

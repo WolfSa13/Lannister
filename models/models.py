@@ -78,12 +78,12 @@ class Request(Base):
     bonus_type = relationship("Bonus", back_populates="requests")
     request_history = relationship("RequestHistory", back_populates="requests")
 
-    def __init__(self, creator, reviewer, type_bonus, payment_amount, status="", description=""):
+    def __init__(self, creator, reviewer, type_bonus, payment_amount, payment_date, status="", description=""):
         self.creator = creator
         self.reviewer = reviewer
         self.type_bonus = type_bonus
         self.payment_amount = payment_amount
-        # self.payment_date = payment_date
+        self.payment_date = payment_date
         self.status = status
         self.description = description
 
