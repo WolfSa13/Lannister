@@ -217,7 +217,7 @@ class RequestHistoryQuery:
 
                 changes_log = ''
                 for key in data.keys():
-                    if data[key] != request.get(key, "-"):
+                    if str(data[key]) != str(request.get(key, "-")):
                         if key == 'reviewer' or key == 'type_bonus' or key == 'creator':
                             continue
 
