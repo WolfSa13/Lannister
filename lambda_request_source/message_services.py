@@ -105,6 +105,18 @@ start_menu = [
 ]
 
 
+def request_created_successfully_reviewer(creator_name):
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": f"{creator_name} created a request, and set You as a reviewer."
+            }
+        }
+    ]
+
+
 def request_created_successfully():
     return [
         {
@@ -172,6 +184,30 @@ def request_deleted_successfully():
             "text": {
                 "type": "plain_text",
                 "text": "Request was deleted successfully"
+            }
+        }
+    ]
+
+
+def request_approved_successfully():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request was approved successfully"
+            }
+        }
+    ]
+
+
+def request_denied_successfully():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request was denied successfully"
             }
         }
     ]
@@ -245,6 +281,24 @@ def generate_request_block_list(request_list):
                                 "text": "Changes history"
                             },
                             "action_id": f"request_history_{request['id']}"
+                        },
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Approve"
+                            },
+                            "style": "primary",
+                            "action_id": f"request_status_approve_{request['id']}"
+                        },
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Deny"
+                            },
+                            "style": "danger",
+                            "action_id": f"request_status_deny_{request['id']}"
                         },
                         {
                             "type": "button",

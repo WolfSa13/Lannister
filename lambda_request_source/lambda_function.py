@@ -104,6 +104,70 @@ def lambda_handler(event, context):
 
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
+    elif action_id.startswith('request_status'):
+        request_id = int(action_id.split('_')[3])
+
+        editor_slack_id = event['user']['id']
+        editor = UsersQuery.get_user_by_slack_id(editor_slack_id)
+
+        if action_id.split('_')[2] == "approve":
+            status = 'approved'
+        else:
+            status = 'denied'
+
+        data = {
+            'status': status
+        }
+
+        old_request = RequestQuery.get_requests(request_id=request_id)[0]
+        result = RequestQuery.update_request(request_id, data)
+
+        if result != 0:
+            RequestHistoryQuery.add_history(data, request_id=request_id, editor=editor['full_name'],
+                                            old_request=old_request)
+
+        response_url = 'https://slack.com/api/chat.postMessage'
+
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + SLACK_BOT_TOKEN
+        }
+
+        blocks = request_approved_successfully()
+        data_editor_massage = {
+            'token': SLACK_BOT_TOKEN,
+            "blocks": blocks
+        }
+
+        blocks = request_change_successfully(request_id)
+        data_information_massage = {
+            'token': SLACK_BOT_TOKEN,
+            "blocks": blocks
+        }
+
+        if result == 1:
+            request = RequestQuery.get_requests(request_id)[0]
+
+            if editor_slack_id == request['creator_slack_id']:
+                data_information_massage['channel'] = request['reviewer_slack_id']
+                data_editor_massage['channel'] = request['creator_slack_id']
+            elif editor_slack_id == request['reviewer_slack_id']:
+                data_information_massage['channel'] = request['creator_slack_id']
+                data_editor_massage['channel'] = request['reviewer_slack_id']
+
+            requests.post(response_url, data=json.dumps(data_editor_massage), headers=headers)
+
+            requests.post(response_url, data=json.dumps(data_information_massage), headers=headers)
+
+        else:
+            blocks = request_error_edit()
+            data_error_message = {
+                'token': SLACK_BOT_TOKEN,
+                'channel': editor_slack_id,
+                'blocks': blocks
+            }
+            requests.post(response_url, data=json.dumps(data_error_message), headers=headers)
+
     elif action_id.startswith('request_delete_'):
         request_id = int(action_id.split('_')[2])
 
@@ -127,8 +191,6 @@ def lambda_handler(event, context):
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('request_modal_create'):
-
-        print(event)
 
         creator_slack_id = event['body']['user']['id']
         creator = UsersQuery.get_user_by_slack_id(creator_slack_id)
@@ -155,11 +217,9 @@ def lambda_handler(event, context):
             'value']
 
         payment_date_block_id = event['body']['view']['blocks'][3]['block_id']
-        print(payment_date_block_id)
 
         payment_date = event['body']['view']['state']['values'][payment_date_block_id]['request_date_input'][
             'selected_date']
-        print(payment_date)
 
         description_block_id = event['body']['view']['blocks'][4]['block_id']
         description = event['body']['view']['state']['values'][description_block_id]['request_description_input'][
@@ -175,7 +235,6 @@ def lambda_handler(event, context):
             'description': description,
             'status': 'created'
         }
-        print(data)
 
         result = RequestQuery.add_new_request(data)
 
@@ -192,9 +251,11 @@ def lambda_handler(event, context):
         }
 
         if result != 0:
-            reviewer = UsersQuery.get_user_by_slack_id(reviewer_id)
+            reviewer = UsersQuery.get_user_by_id(int(reviewer_id))
             channel_id = reviewer['slack_id']
-            blocks = request_created_successfully()
+
+            creator_name = creator['full_name']
+            blocks = request_created_successfully_reviewer(creator_name)
             data_reviewer_message = {
                 'token': SLACK_BOT_TOKEN,
                 'channel': channel_id,
@@ -211,7 +272,7 @@ def lambda_handler(event, context):
             requests.post(response_url, data=json.dumps(data_creator_message), headers=headers)
 
         else:
-            creator = UsersQuery.get_user_by_slack_id(creator_id)['id']
+            creator = UsersQuery.get_user_by_slack_id(creator_slack_id)[0]
             channel_id = creator['slack_id']
             blocks = request_not_created()
             data_error_message = {
@@ -224,8 +285,6 @@ def lambda_handler(event, context):
 
     elif action_id.startswith('request_modal_edit'):
         request_id = int(action_id.split('_')[3])
-
-        print(event)
 
         editor_slack_id = event['body']['user']['id']
         creator = UsersQuery.get_user_by_slack_id(editor_slack_id)
@@ -251,11 +310,9 @@ def lambda_handler(event, context):
             'value']
 
         payment_date_block_id = event['body']['view']['blocks'][3]['block_id']
-        print(payment_date_block_id)
 
         payment_date = event['body']['view']['state']['values'][payment_date_block_id]['request_date_input'][
             'selected_date']
-        print(payment_date)
 
         description_block_id = event['body']['view']['blocks'][4]['block_id']
         description = event['body']['view']['state']['values'][description_block_id]['request_description_input'][
@@ -269,7 +326,6 @@ def lambda_handler(event, context):
             'payment_date': str(payment_date),
             'description': description
         }
-        print(data)
 
         old_request = RequestQuery.get_requests(request_id=request_id)[0]
         result = RequestQuery.update_request(request_id, data)
