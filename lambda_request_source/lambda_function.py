@@ -172,15 +172,6 @@ def lambda_handler(event, context):
             data['bonus_name'] = bonus_type_name.replace('+', ' ')
             RequestHistoryQuery.add_history(data, request_id=result, editor=creator['full_name'])
 
-        blocks = request_created_successfully()
-
-        data = {
-            'token': SLACK_BOT_TOKEN,
-            'channel': creator_slack_id,
-            "blocks": blocks
-        }
-
-
         response_url = 'https://slack.com/api/chat.postMessage'
 
         headers = {
@@ -188,18 +179,16 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        result = RequestQuery.add_new_request(data)
-        if result == 1:
+        if result != 0:
             reviewer = UsersQuery.get_user_by_slack_id(reviewer_id)
             channel_id = reviewer['slack_id']
-            blocks = request_created_successfully() # new req
+            blocks = request_created_successfully()
             data_reviewer_message = {
                 'token': SLACK_BOT_TOKEN,
                 'channel': channel_id,
                 "blocks": blocks
             }
             requests.post(response_url, data=json.dumps(data_reviewer_message), headers=headers)
-
 
             blocks = request_created_successfully()
             data_creator_message = {
@@ -252,6 +241,8 @@ def lambda_handler(event, context):
             'value']
         description = description.replace('+', ' ')
 
+        print(payment_amount, type(payment_amount))
+
         data = {
             'reviewer': int(reviewer_id),
             'type_bonus': int(bonus_type_id),
@@ -260,20 +251,13 @@ def lambda_handler(event, context):
         }
         old_request = RequestQuery.get_requests(request_id=request_id)[0]
         result = RequestQuery.update_request(request_id, data)
+        print(result)
 
         if result != 0:
             data['reviewer_name'] = reviewer_name.replace('+', ' ')
             data['bonus_name'] = bonus_type_name.replace('+', ' ')
             RequestHistoryQuery.add_history(data, request_id=request_id, editor=creator['full_name'],
                                             old_request=old_request)
-
-        blocks = request_edited_successfully()
-
-        data = {
-            'token': SLACK_BOT_TOKEN,
-            'channel': editor_slack_id,
-            'blocks': blocks
-        }
 
         response_url = 'https://slack.com/api/chat.postMessage'
 
@@ -282,22 +266,21 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        result = RequestQuery.update_request(request_id, data)
-
         blocks = request_edited_successfully()
         data_editor_massage = {
             'token': SLACK_BOT_TOKEN,
             "blocks": blocks
         }
 
-        blocks = request_change_successfully()
+        blocks = request_change_successfully(request_id)
         data_information_massage = {
             'token': SLACK_BOT_TOKEN,
             "blocks": blocks
+
         }
 
         if result == 1:
-            request = RequestQuery.get_requests(request_id)
+            request = RequestQuery.get_requests(request_id)[0]
 
             if editor_slack_id == request['creator_slack_id']:
                   data_information_massage['channel'] = request['reviewer_slack_id']

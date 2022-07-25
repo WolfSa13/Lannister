@@ -139,13 +139,13 @@ def request_edited_successfully():
         }
     ]
 
-def request_change_successfully():
+def request_change_successfully(requist_id):
     return [
         {
             "type": "section",
             "text": {
                 "type": "plain_text",
-                "text": "Request was changed."
+                "text": f"request #{requist_id} was changed."
             }
         }
     ]
