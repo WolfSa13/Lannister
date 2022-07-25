@@ -338,3 +338,12 @@ back_to_user_start_menu_button = {
         }
     ]
 }
+
+
+def check_if_cpp_dev(position):
+    if 'c++' in position:
+        return position.replace('c++', 'cpp').replace('+', ' ').replace('cpp', 'c++')
+    elif 'C++' in position:
+        return position.replace('C++', 'Cpp').replace('+', ' ').replace('Cpp', 'C++')
+
+    return position.replace('+', ' ')

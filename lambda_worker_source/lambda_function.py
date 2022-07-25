@@ -72,7 +72,7 @@ def lambda_handler(event, context):
 
         position_block_id = event['body']['view']['blocks'][1]['block_id']
         position = event['body']['view']['state']['values'][position_block_id]['position_input']['value']
-        position = position.replace('+', ' ')
+        position = check_if_cpp_dev(position)
 
         roles_block_id = event['body']['view']['blocks'][2]['block_id']
         roles = []
@@ -142,7 +142,7 @@ def lambda_handler(event, context):
 
         position_block_id = event['body']['view']['blocks'][1]['block_id']
         position = event['body']['view']['state']['values'][position_block_id]['position_input']['value']
-        position = position.replace('+', ' ')
+        position = check_if_cpp_dev(position)
 
         roles_block_id = event['body']['view']['blocks'][2]['block_id']
         roles = []
