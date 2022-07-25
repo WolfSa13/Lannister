@@ -22,7 +22,6 @@ roles_options = [
     }
 ]
 
-
 def get_user_by_id(user_id, users_list):
     for user in users_list:
         if user['id'] == int(user_id):
@@ -67,7 +66,7 @@ def generate_user_block_list(user_list):
                                 "type": "plain_text",
                                 "text": "Edit"
                             },
-                            "action_id": "worker_edit_" + str(user['id'])
+                            "action_id": f"worker_edit_{user['id']}"
                         },
                         {
                             "type": "button",
@@ -76,7 +75,7 @@ def generate_user_block_list(user_list):
                                 "text": "Delete"
                             },
                             "style": "danger",
-                            "action_id": "worker_delete_" + str(user['id'])
+                            "action_id": f"worker_delete_{user['id']}"
                         }
                     ]
                 }
@@ -244,28 +243,40 @@ def worker_edit_modal(user):
         ]
     }
 
+error_message = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": "Operation is unsuccessful. Try again."
+    }
+}
 
-def user_created_successfully(data):
+
+def user_created_successfully(full_name):
     return {
         "type": "section",
         "text": {
             "type": "plain_text",
-            "text": f"{data['full_name']}, {data['position']}, {data['roles']}, {data['slack_id']}"
-            # "text": f"User {data['full_name']} was created successfulyy"
+             "text": f"User {full_name} was created successfuly."
         }
     }
 
 
-def user_edited_successfully(data):
-    return {
-        "type": "section",
-        "text": {
-            "type": "plain_text",
-            "text": f"{data['full_name']}, {data['position']}, {data['roles']}, {data['slack_id']}"
-            # "text": f"User {data['full_name']} was edited successfulyy"
-        }
+user_edited_successfully = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": "User was edited successfully"
     }
+}
 
+user_deleted_successfully = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": "User was deleted successfully"
+    }
+}
 
 user_start_menu = [
     {

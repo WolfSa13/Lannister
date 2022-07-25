@@ -145,7 +145,7 @@ def request_change_successfully(requist_id):
             "type": "section",
             "text": {
                 "type": "plain_text",
-                "text": f"request #{requist_id} was changed."
+                "text": f"Request #{requist_id} was changed."
             }
         }
     ]

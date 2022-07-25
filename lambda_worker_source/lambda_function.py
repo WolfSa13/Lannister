@@ -92,14 +92,16 @@ def lambda_handler(event, context):
             'slack_id': slack_id
         }
 
-        UsersQuery.add_new_user(data)
-        print(f'created user data {data}')
-        # blocks = [user_created_successfully(data), user_start_menu[0]]
+        users_created = UsersQuery.add_new_user(data)
+        blocks = [error_message]
+
+        if users_created:
+            blocks = [user_created_successfully(full_name)]
 
         data = {
             "token": SLACK_BOT_TOKEN,
             'channel': event['body']['user']['id'],
-            # "blocks": blocks
+            "blocks": blocks
         }
 
         response_url = 'https://slack.com/api/chat.postMessage'
@@ -158,24 +160,23 @@ def lambda_handler(event, context):
         slack_id_block_id = event['body']['view']['blocks'][3]['block_id']
         slack_id = event['body']['view']['state']['values'][slack_id_block_id]['slack_id_input']['value']
 
-        print(roles)
-
         data = {
             'full_name': full_name,
             'position': position,
             'roles': roles,
             'slack_id': slack_id
         }
-        print(f'edited user data {data}')
 
-        UsersQuery.update_user(user_id, data)
-        print(f'edited user id {user_id}, edited user data {data}')
-        # blocks = [user_edited_successfully(data), user_start_menu[0]]
+        users_updated = UsersQuery.update_user(user_id, data)
+        blocks = [error_message]
+
+        if users_updated:
+            blocks = [user_edited_successfully]
 
         data = {
             "token": SLACK_BOT_TOKEN,
             'channel': event['body']['user']['id'],
-            # "blocks": blocks
+            "blocks": blocks
         }
 
         response_url = 'https://slack.com/api/chat.postMessage'
@@ -189,17 +190,23 @@ def lambda_handler(event, context):
 
     elif action_id.startswith("worker_delete_"):
         user_id = int(action_id.split('_')[2])
-        user = UsersQuery.delete_user(user_id)
-        attachments = generate_user_block_list(user)
+
+        user_deleted = UsersQuery.delete_user(user_id)
+
+        blocks = [error_message]
+        if user_deleted:
+            blocks = [user_deleted_successfully]
+
         data = {
-            "response_type": 'in_channel',
-            "replace_original": True,
-            "attachments": attachments
+            'token': SLACK_BOT_TOKEN,
+            'channel': event['user']['id'],
+            "blocks": blocks
         }
 
-        response_url = event['response_url']
+        response_url = 'https://slack.com/api/chat.postMessage'
         headers = {
-            'Content-type': 'application/json'
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
         requests.post(response_url, data=json.dumps(data), headers=headers)
