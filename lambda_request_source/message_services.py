@@ -116,6 +116,18 @@ def request_created_successfully():
     ]
 
 
+def request_not_created():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request wasn't created. Try again"
+            }
+        }
+    ]
+
+
 def request_edited_successfully():
     return [
         {
@@ -123,6 +135,29 @@ def request_edited_successfully():
             "text": {
                 "type": "plain_text",
                 "text": "Request was edited successfully"
+            }
+        }
+    ]
+
+def request_change_successfully():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request was changed."
+            }
+        }
+    ]
+
+
+def request_error_edit():
+    return [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Request wasn't edited successfully. Try again"
             }
         }
     ]

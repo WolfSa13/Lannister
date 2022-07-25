@@ -29,7 +29,9 @@ class RequestQuery:
             reviewer = db.orm.aliased(Users)
             query = session.query(Requests, ColElem.label(TypeBonuses.c.type, 'bonus_name'),
                                   ColElem.label(creator.c.full_name, 'creator_name'),
-                                  ColElem.label(reviewer.c.full_name, 'reviewer_name')).order_by(Requests.columns.id)
+                                  ColElem.label(creator.c.slack_id, 'creator_slack_id'),
+                                  ColElem.label(reviewer.c.full_name, 'reviewer_name'),
+                                  ColElem.label(reviewer.c.slack_id, 'reviewer_slack_id')).order_by(Requests.columns.id)
             if request_id is not None:
                 query = query.filter(Requests.columns.id == request_id)
 
@@ -42,12 +44,16 @@ class RequestQuery:
     @staticmethod
     def update_request(request_id, data):
         with Session(engine) as session:
-            query = session.query(Requests).filter(Requests.columns.id == request_id)
-            query_result = query.update(data)
+            try:
+                query = session.query(Requests).filter(Requests.columns.id == request_id)
+                query.update(data)
+                session.commit()
+            except db.exc.SQLAlchemyError as e:
+                session.rollback()
+                return 0
 
-            session.commit()
+        return 1
 
-        return query_result
 
     @staticmethod
     def delete_request(request_id):

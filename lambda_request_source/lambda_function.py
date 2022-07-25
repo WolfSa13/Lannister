@@ -184,16 +184,6 @@ def lambda_handler(event, context):
             'description': description,
         }
 
-        RequestQuery.add_new_request(data)
-
-        blocks = request_created_successfully()
-
-        data = {
-            'token': SLACK_BOT_TOKEN,
-            'channel': creator_slack_id,
-            "blocks": blocks
-        }
-
         response_url = 'https://slack.com/api/chat.postMessage'
 
         headers = {
@@ -201,13 +191,43 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        requests.post(response_url, data=json.dumps(data), headers=headers)
+        result = RequestQuery.add_new_request(data)
+        if result == 1:
+            reviewer = UsersQuery.get_user_by_slack_id(reviewer_id)
+            channel_id = reviewer['slack_id']
+            blocks = request_created_successfully() # new req
+            data_reviewer_message = {
+                'token': SLACK_BOT_TOKEN,
+                'channel': channel_id,
+                "blocks": blocks
+            }
+            requests.post(response_url, data=json.dumps(data_reviewer_message), headers=headers)
+
+
+            blocks = request_created_successfully()
+            data_creator_message = {
+                'token': SLACK_BOT_TOKEN,
+                'channel': creator_slack_id,
+                'blocks': blocks
+            }
+            requests.post(response_url, data=json.dumps(data_creator_message), headers=headers)
+
+        else:
+            creator = UsersQuery.get_user_by_slack_id(creator_id)['id']
+            channel_id = creator['slack_id']
+            blocks = request_not_created()
+            data_error_message = {
+                'token': SLACK_BOT_TOKEN,
+                'channel': channel_id,
+                'blocks': blocks
+            }
+
+            requests.post(response_url, data=json.dumps(data_error_message), headers=headers)
 
     elif action_id.startswith('request_modal_edit'):
         request_id = int(action_id.split('_')[3])
-
-        creator_slack_id = event['body']['user']['id']
-        # creator_id = UsersQuery.get_user_by_slack_id(creator_slack_id)['id']
+        editor_slack_id = event['body']['user']['id']
+        editor_id = UsersQuery.get_user_by_slack_id(editor_slack_id)['id']
 
         reviewer_block_id = event['body']['view']['blocks'][0]['block_id']
         reviewer_id = \
@@ -235,16 +255,6 @@ def lambda_handler(event, context):
             'description': description,
         }
 
-        RequestQuery.update_request(request_id, data)
-
-        blocks = request_edited_successfully()
-
-        data = {
-            'token': SLACK_BOT_TOKEN,
-            'channel': creator_slack_id,
-            'blocks': blocks
-        }
-
         response_url = 'https://slack.com/api/chat.postMessage'
 
         headers = {
@@ -252,4 +262,44 @@ def lambda_handler(event, context):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        requests.post(response_url, data=json.dumps(data), headers=headers)
+        result = RequestQuery.update_request(request_id, data)
+
+        blocks = request_edited_successfully()
+        data_editor_massage = {
+            'token': SLACK_BOT_TOKEN,
+            "blocks": blocks
+        }
+
+        blocks = request_change_successfully()
+        data_information_massage = {
+            'token': SLACK_BOT_TOKEN,
+            "blocks": blocks
+        }
+
+        if result == 1:
+            request = RequestQuery.get_requests(request_id)
+
+            if editor_slack_id == request['creator_slack_id']:
+                  data_information_massage['channel'] = request['reviewer_slack_id']
+                  data_editor_massage['channel'] = request['creator_slack_id']
+            elif editor_slack_id == request['reviewer_slack_id']:
+                data_information_massage['channel'] = request['creator_slack_id']
+                data_editor_massage['channel'] = request['reviewer_slack_id']
+
+            requests.post(response_url, data=json.dumps(data_editor_massage), headers=headers)
+
+            requests.post(response_url, data=json.dumps(data_information_massage), headers=headers)
+
+        else:
+
+            blocks = request_error_edit()
+            data_error_message = {
+                'token': SLACK_BOT_TOKEN,
+                'channel': editor_slack_id,
+                'blocks': blocks
+            }
+            requests.post(response_url, data=json.dumps(data_error_message), headers=headers)
+
+
+
+
