@@ -59,3 +59,15 @@ def invoke_lambda(function_name, data):
         InvocationType='Event',
         Payload=json.dumps(data)
     )
+
+
+def invoke_request_response_lambda(function_name, data):
+    client = boto3.client('lambda')
+
+    response = client.invoke(
+        FunctionName=function_name,
+        InvocationType='RequestResponse',
+        Payload=json.dumps(data)
+    )
+
+    return response

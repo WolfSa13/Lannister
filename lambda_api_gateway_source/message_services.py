@@ -1,13 +1,23 @@
 import requests
-import json
+from utils import *
 
 
-def get_main_menu_blocks():
+def get_main_menu_blocks(user_slack_id):
     workers_action_id = 'worker_start_menu'
     requests_action_id = 'request_start_menu'
     bonuses_action_id = 'bonus_start_menu'
 
-    return [
+    function_name = resolve_function_name('worker')
+
+    data = {
+        "user_slack_id": user_slack_id,
+        "action_id": 'worker_get'
+    }
+
+    response = json.load(invoke_request_response_lambda(function_name, data)['Payload'])
+    user_roles = response['roles']
+
+    start_menu = [
         {
             "type": "section",
             "text": {
@@ -21,14 +31,6 @@ def get_main_menu_blocks():
         {
             "type": "actions",
             "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Workers"
-                    },
-                    "action_id": workers_action_id
-                },
                 {
                     "type": "button",
                     "text": {
@@ -49,11 +51,25 @@ def get_main_menu_blocks():
         }
     ]
 
+    worker_button = {
+        "type": "button",
+        "text": {
+            "type": "plain_text",
+            "text": "Workers"
+        },
+        "action_id": workers_action_id
+    }
 
-def respond_with_menu(response_url):
+    if 'administrator' in user_roles:
+        start_menu[2]['elements'].insert(0, worker_button)
+
+    return start_menu
+
+
+def respond_with_menu(response_url, user_slack_id):
     data = {
         'response_type': 'in_channel',
-        "blocks": get_main_menu_blocks()
+        "blocks": get_main_menu_blocks(user_slack_id)
     }
 
     headers = {
