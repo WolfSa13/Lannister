@@ -75,3 +75,17 @@ functions:
       POSTGRES_PORT: ${env:POSTGRES_PORT}
       POSTGRES_DB: ${env:POSTGRES_DB}
       SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+
+  check_payment-lambda:
+    image:
+      name: lambda_check_payment_day-image
+    environment:
+      POSTGRES_USER: ${env:POSTGRES_USER}
+      POSTGRES_PASSWORD: ${env:POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${env:POSTGRES_HOST}
+      POSTGRES_PORT: ${env:POSTGRES_PORT}
+      POSTGRES_DB: ${env:POSTGRES_DB}
+      SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+    events:
+      - eventBridge:
+          schedule: cron( 0 11 ? * 2-6 *)

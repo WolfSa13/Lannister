@@ -1,75 +1,72 @@
-from orm_services import UsersQuery, TypeBonusesQuery
+from orm_services import RequestQuery
 from datetime import date
 from time_utils import datetime_converter, date_converter
 
 
-
-
-def request_string(request_id):
-    return {
-        "color": "#008000",
+def generate_notification_payment_day(request_list):
+    current_date = date.today().strftime("%Y-%m-%d")
+    attachments = []
+    info_string = {
+        "color": "#09ab19",
         "blocks": [
             {
-                "type": "header",
+                "type": "section",
                 "text": {
                     "type": "plain_text",
-                    "text": f"Tha payment day of #{request_id} is today!"
+                    "text": f"These requests have to be paid today: {date_converter(current_date)}"
+
                 }
             }
         ]
     }
 
+    attachments.append(info_string)
 
-def generate_notification_payment_day(request_list):
-    """
-    request_list = [
-            {
-                id': 1,
-                'request_id': 1,
-                'creator': 'Name',
-                'bonus_type': 'bonus_name',
-                'creation date': '24-07-2022 14:22',
-                'payment_amount': '200$',
-            }
-        ]
-    """
+    for request in request_list:
 
-    attachments = [request_string(request_list[0].request_id)]
+        payment_date = request['payment_date']
 
-    for request_history_event in request_list:
-        request_history_item = {
+        request_item = {
             "color": "#09ab19",
             "blocks": [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"Request #{request['id']}"
+                    }
+                },
                 {
                     "type": "section",
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"*Editor:* {request_history_event.editor}"
+                            "text": f"*Creator:* {request['creator_name']}"
+                        },
+
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Bonus type:* {request['bonus_name']}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*When:* {datetime_converter(request_history_event.timestamp)}"
+                            "text": f"*Payment amount:*  {request['payment_amount']}$"
                         }
                     ]
                 },
                 {
                     "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": f"*Changes:*\n{request_history_event.changes}"
-                    }
-                }
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Creation date:* {datetime_converter(request['created_at'])}\n"
+                                    f"*Payment date:* {date_converter(payment_date)}"
+                        }
+                    ]
+                },
             ]
         }
-
-        attachments.append(request_history_item)
+        attachments.append(request_item)
 
     return attachments
-
-
-def get_request_by_id(request_id, request_list):
-    for request in request_list:
-        if request['id'] == int(request_id):
-            return request
 

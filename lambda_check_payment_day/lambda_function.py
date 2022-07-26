@@ -1,22 +1,52 @@
 import json
 import requests
 import os
-import boto3
-import datetime
 from time_utils import *
 from message_services import *
-from orm_services import RequestQuery, UsersQuery, RequestHistoryQuery
+from orm_services import RequestQuery
 
+SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 
 
 def lambda_handler(event, context):
-    region_name = os.environ.get('AWS_REGION')
-    client = boto3.client("lambda", region_name=region_name)
-    payload = {"Message": 'attachments'}
-    resp = client.invoke(FunctionName='lambda_request_source', InvocationType="Event", Payload=json.dump(payload))
 
-    return {
-        'statusCode': 200
+    '''test_data = {
+        'reviewer_slack_id': [{
+            'id': 'request_id',
+            'creator_name': 'Name',
+            'created_at': 'Date',
+            'bonus_name': 'bonus_type',
+            'payment_amount': '200$'
+        }]
+    }'''
+
+    requests_payment = RequestQuery.get_requests_by_payment_date()
+
+    response_url = 'https://slack.com/api/chat.postMessage'
+
+    headers = {
+        'Content-type': 'application/json',
+        "Authorization": "Bearer " + SLACK_BOT_TOKEN
     }
+
+    for key, value in requests_payment.items():
+        blocks = generate_notification_payment_day(value)
+
+        data = {
+            "token": SLACK_BOT_TOKEN,
+            'channel': key,
+            "blocks": blocks
+        }
+
+        requests.post(response_url, data=json.dumps(data), headers=headers)
+
+
+
+
+
+
+
+
+
 
 
