@@ -22,6 +22,9 @@ provider:
         file: worker-lambda.Dockerfile
       lambda-api_gateway-image:
         path: ./lambda_api_gateway_source
+      lambda-check_payment-image:
+        path: .
+        file: check_payment_day-lambda.Dockerfile
 
 
 functions:
@@ -78,7 +81,7 @@ functions:
 
   check_payment-lambda:
     image:
-      name: lambda_check_payment_day-image
+      name: lambda-check_payment-image
     environment:
       POSTGRES_USER: ${env:POSTGRES_USER}
       POSTGRES_PASSWORD: ${env:POSTGRES_PASSWORD}
@@ -88,4 +91,5 @@ functions:
       SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
     events:
       - eventBridge:
-          schedule: cron( 0 11 ? * 2-6 *)
+          schedule: cron(0 6 ? * 2-6 *)
+#          schedule: cron(*/1 * ? * * *)

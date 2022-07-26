@@ -1,4 +1,3 @@
-from orm_services import RequestQuery
 from datetime import date
 from time_utils import datetime_converter, date_converter
 
@@ -14,7 +13,6 @@ def generate_notification_payment_day(request_list):
                 "text": {
                     "type": "plain_text",
                     "text": f"These requests have to be paid today: {date_converter(current_date)}"
-
                 }
             }
         ]
@@ -23,9 +21,6 @@ def generate_notification_payment_day(request_list):
     attachments.append(info_string)
 
     for request in request_list:
-
-        payment_date = request['payment_date']
-
         request_item = {
             "color": "#09ab19",
             "blocks": [
@@ -43,10 +38,18 @@ def generate_notification_payment_day(request_list):
                             "type": "mrkdwn",
                             "text": f"*Creator:* {request['creator_name']}"
                         },
-
                         {
                             "type": "mrkdwn",
-                            "text": f"*Bonus type:* {request['bonus_name']}"
+                            "text": f"*Creation date:* {datetime_converter(request['created_at'])}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Bonus type:* {request['type']}"
                         },
                         {
                             "type": "mrkdwn",
@@ -59,11 +62,10 @@ def generate_notification_payment_day(request_list):
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"*Creation date:* {datetime_converter(request['created_at'])}\n"
-                                    f"*Payment date:* {date_converter(payment_date)}"
+                            "text": f"*Description:* {request['description']}"
                         }
                     ]
-                },
+                }
             ]
         }
         attachments.append(request_item)
