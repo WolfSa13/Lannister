@@ -215,10 +215,39 @@ def request_denied_successfully():
     ]
 
 
-def generate_request_block_list(request_list):
+def generate_request_block_list(request_list, user):
     attachments = []
 
     for request in request_list:
+        approve_button = {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Approve"
+            },
+            "style": "primary",
+            "action_id": f"request_status_approve_{request['id']}"
+        }
+
+        deny_button = {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Deny"
+            },
+            "style": "danger",
+            "action_id": f"request_status_deny_{request['id']}"
+        }
+
+        delete_button = {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Delete"
+            },
+            "style": "danger",
+            "action_id": f"request_delete_{request['id']}"
+        }
 
         payment_date = request['payment_date']
         if not payment_date:
@@ -289,41 +318,21 @@ def generate_request_block_list(request_list):
                             "type": "button",
                             "text": {
                                 "type": "plain_text",
-                                "text": "Approve"
-                            },
-                            "style": "primary",
-                            "action_id": f"request_status_approve_{request['id']}"
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Deny"
-                            },
-                            "style": "danger",
-                            "action_id": f"request_status_deny_{request['id']}"
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
                                 "text": "Edit"
                             },
                             "action_id": f"request_edit_{request['id']}"
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Delete"
-                            },
-                            "style": "danger",
-                            "action_id": f"request_delete_{request['id']}"
                         }
                     ]
                 },
             ]
         }
+
+        if 'administrator' in user['roles'] or 'reviewer' in user['roles']:
+            request_item['blocks'][4]['elements'].append(approve_button)
+            request_item['blocks'][4]['elements'].append(deny_button)
+        elif 'worker' in user['roles']:
+            request_item['blocks'][4]['elements'].append(delete_button)
+
         attachments.append(request_item)
 
     attachments.append(back_to_request_start_menu_button)
