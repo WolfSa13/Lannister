@@ -429,13 +429,16 @@ def get_request_by_id(request_id, request_list):
             return request
 
 
-def request_create_modal():
+def request_create_modal(user):
     reviewer_list = UsersQuery.get_reviewers()
 
     bonus_list = TypeBonusesQuery.get_bonuses()
 
     reviewer_options = []
     for reviewer in reviewer_list:
+        if user['id'] == reviewer['id']:
+            continue
+
         reviewer_item = {
             "text": {
                 "type": "plain_text",
@@ -543,7 +546,7 @@ def request_create_modal():
     }
 
 
-def request_edit_modal(request):
+def request_edit_modal(request, user):
     reviewer_list = UsersQuery.get_reviewers()
     for reviewer in reviewer_list:
         if reviewer['id'] == request['reviewer']:
@@ -558,6 +561,9 @@ def request_edit_modal(request):
 
     reviewer_options = []
     for reviewer in reviewer_list:
+        if user['id'] == reviewer['id']:
+            continue
+
         reviewer_item = {
             "text": {
                 "type": "plain_text",

@@ -67,9 +67,10 @@ def lambda_handler(event, context):
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id == 'request_create':
+        user = UsersQuery.get_user_by_slack_id(event['user']['id'])
         data = {
             "trigger_id": event['trigger_id'],
-            "view": request_create_modal()
+            "view": request_create_modal(user)
         }
 
         response_url = 'https://slack.com/api/views.open'
@@ -82,13 +83,14 @@ def lambda_handler(event, context):
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('request_edit'):
+        user = UsersQuery.get_user_by_slack_id(event['user']['id'])
         request_id = int(action_id.split('_')[2])
 
         request = RequestQuery.get_requests(request_id)[0]
 
         data = {
             "trigger_id": event['trigger_id'],
-            "view": request_edit_modal(request)
+            "view": request_edit_modal(request, user)
         }
 
         response_url = 'https://slack.com/api/views.open'
