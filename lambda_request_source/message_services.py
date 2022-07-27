@@ -45,31 +45,12 @@ request_start_menu = [
     }
 ]
 
-back_to_request_start_menu_button = {
-    "color": "#008000",
-    "blocks": [
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Back"
-                    },
-                    "action_id": "request_start_menu"
-                }
-            ]
-        }
-    ]
-}
-
-start_menu = [
+worker_request_list_menu = [
     {
-        "type": "section",
+        "type": "header",
         "text": {
             "type": "plain_text",
-            "text": "Hi, I'm here. What do you want to do?"
+            "text": "Requests list"
         }
     },
     {
@@ -82,29 +63,606 @@ start_menu = [
                 "type": "button",
                 "text": {
                     "type": "plain_text",
-                    "text": "Workers"
+                    "text": "Pending and unpaid yet"
                 },
-                "action_id": "worker_start_menu"
+                "action_id": "request_list_worker_pending_unpaid_requests"
             },
             {
                 "type": "button",
                 "text": {
                     "type": "plain_text",
-                    "text": "Requests"
+                    "text": "Paid and denied"
+                },
+                "action_id": "request_list_worker_approved_denied_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Deleted"
+                },
+                "action_id": "request_list_worker_deleted_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Back"
                 },
                 "action_id": "request_start_menu"
-            },
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Bonuses"
-                },
-                "action_id": "bonus_start_menu"
             }
         ]
     }
 ]
+
+request_list_reviewer_menu = [
+    {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Requests list"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
+        "type": "actions",
+        "elements": [
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "My requests"
+                },
+                "action_id": "request_list_reviewer_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Requests to review"
+                },
+                "action_id": "request_list_reviewer_to_review"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Back"
+                },
+                "action_id": "request_start_menu"
+            }
+        ]
+    }
+]
+
+request_list_reviewer_requests = [
+    {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Requests list"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
+        "type": "actions",
+        "elements": [
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Pending and unpaid yet"
+                },
+                "action_id": "request_list_worker_pending_unpaid_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Paid and denied"
+                },
+                "action_id": "request_list_worker_approved_denied_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Deleted"
+                },
+                "action_id": "request_list_worker_deleted_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Back"
+                },
+                "action_id": "request_list_reviewer_menu"
+            }
+        ]
+    }
+]
+
+request_list_administrator_menu = [
+    {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Requests list"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
+        "type": "actions",
+        "elements": [
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "My requests"
+                },
+                "action_id": "request_list_reviewer_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Requests to review"
+                },
+                "action_id": "request_list_reviewer_to_review"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "All requests"
+                },
+                "action_id": "request_list_administrator_all_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Back"
+                },
+                "action_id": "request_start_menu"
+            }
+        ]
+    }
+]
+
+request_list_administrator_requests = [
+    {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Requests list"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
+        "type": "actions",
+        "elements": [
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Pending and unpaid yet"
+                },
+                "action_id": "request_list_worker_pending_unpaid_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Paid and denied"
+                },
+                "action_id": "request_list_worker_approved_denied_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Deleted"
+                },
+                "action_id": "request_list_worker_deleted_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Back"
+                },
+                "action_id": "request_list_administrator_menu"
+            }
+        ]
+    }
+]
+
+request_list_administrator_all_requests = [
+    {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "All requests"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
+        "type": "actions",
+        "elements": [
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Pending"
+                },
+                "action_id": "request_list_administrator_all_requests_pending"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Not paid"
+                },
+                "action_id": "request_list_administrator_all_requests_unpaid"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Paid"
+                },
+                "action_id": "request_list_administrator_all_requests_paid"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Denied"
+                },
+                "action_id": "request_list_administrator_all_requests_denied"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Deleted"
+                },
+                "action_id": "request_list_administrator_all_requests_deleted"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Back"
+                },
+                "action_id": "request_list_administrator_menu"
+            }
+        ]
+    }
+]
+
+back_to_request_start_menu_button = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": "request_list"
+                }
+            ]
+        }
+    ]
+}
+
+back_to_request_list_reviewer_menu = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": 'request_list_reviewer_menu'
+                }
+            ]
+        }
+    ]
+}
+
+back_to_request_list_reviewers_requests = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": 'request_list_reviewer_requests'
+                }
+            ]
+        }
+    ]
+}
+
+back_to_request_list_administrator_menu = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": 'request_list_administrator_menu'
+                }
+            ]
+        }
+    ]
+}
+
+back_to_request_list_administrator_all_requests = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": 'request_list_administrator_all_requests'
+                }
+            ]
+        }
+    ]
+}
+
+
+def generate_request_block_list(request_list, user, action_id):
+    attachments = []
+
+    for request in request_list:
+        approve_button = {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Approve"
+            },
+            "style": "primary",
+            "action_id": f"request_status_approve_{request['id']}"
+        }
+
+        deny_button = {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Deny"
+            },
+            "style": "danger",
+            "action_id": f"request_status_deny_{request['id']}"
+        }
+
+        delete_button = {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Delete"
+            },
+            "style": "danger",
+            "action_id": f"request_delete_{request['id']}"
+        }
+
+        request_item = {
+            "color": "#09ab19",
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"Request #{request['id']} " + request['status']
+                    }
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Creator:* {request['creator_name']}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Reviewer:* {request['reviewer_name']}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Bonus type:* {request['bonus_name']}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Payment amount:*  {request['payment_amount']}$"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Creation date:* {datetime_converter(request['created_at'])}\n"
+                                    f"*Payment date:* {date_converter(request['payment_date'])}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Description:* {request['description']}"
+                        }
+                    ]
+                },
+                {
+                    "type": "actions",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Changes history"
+                            },
+                            "action_id": f"request_history_{request['id']}"
+                        }
+                    ]
+                }
+            ]
+        }
+
+        if request['status'] == 'created':
+            request_item['blocks'][-1]['elements'].append(
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Edit"
+                    },
+                    "action_id": f"request_edit_{request['id']}"
+                }
+            )
+
+        if action_id == 'request_list_worker_pending_unpaid_requests':
+            request_item['blocks'][4]['elements'].append(delete_button)
+        elif action_id == 'request_list_reviewer_to_review':
+            request_item['blocks'][4]['elements'].append(approve_button)
+            request_item['blocks'][4]['elements'].append(deny_button)
+        elif action_id.startswith('request_list_administrator_all_requests'):
+            query_name = action_id.split('_')[5]
+            if query_name in ['pending', 'unpaid']:
+                request_item['blocks'][4]['elements'].append(approve_button)
+                request_item['blocks'][4]['elements'].append(deny_button)
+
+        attachments.append(request_item)
+
+    if 'administrator' in user['roles']:
+        if action_id.startswith('request_list_worker'):
+            attachments.append(back_to_request_list_reviewers_requests)
+        elif action_id == 'request_list_reviewer_to_review':
+            attachments.append(back_to_request_list_administrator_menu)
+        elif action_id.startswith('request_list_administrator_all_requests_'):
+            attachments.append(back_to_request_list_administrator_all_requests)
+    elif 'reviewer' in user['roles']:
+        if action_id.startswith('request_list_worker'):
+            attachments.append(back_to_request_list_reviewers_requests)
+        elif action_id == 'request_list_reviewer_to_review':
+            attachments.append(back_to_request_list_reviewer_menu)
+    else:
+        if action_id.startswith('request_list_worker'):
+            attachments.append(back_to_request_start_menu_button)
+
+    return attachments
+
+
+def request_history_string(request_id):
+    return {
+        "color": "#008000",
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": f"History of request #{request_id}"
+                }
+            }
+        ]
+    }
+
+
+back_to_request_list_button = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": "request_message_delete"
+                }
+            ]
+        }
+    ]
+}
+
+
+def generate_request_history_block_list(request_history_list):
+    attachments = [request_history_string(request_history_list[0].request_id)]
+
+    for request_history_event in request_history_list:
+        request_history_item = {
+            "color": "#09ab19",
+            "blocks": [
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Editor:* {request_history_event.editor}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*When:* {datetime_converter(request_history_event.timestamp)}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*Changes:*\n{request_history_event.changes}"
+                    }
+                }
+            ]
+        }
+
+        attachments.append(request_history_item)
+
+    attachments.append(back_to_request_list_button)
+
+    return attachments
 
 
 def request_created_successfully_reviewer(creator_name):
@@ -201,232 +759,6 @@ def request_approved_successfully():
             }
         }
     ]
-
-
-def request_denied_successfully():
-    return [
-        {
-            "type": "section",
-            "text": {
-                "type": "plain_text",
-                "text": "Request was denied successfully"
-            }
-        }
-    ]
-
-
-def generate_request_block_list(request_list, user):
-    attachments = []
-
-    for request in request_list:
-        approve_button = {
-            "type": "button",
-            "text": {
-                "type": "plain_text",
-                "text": "Approve"
-            },
-            "style": "primary",
-            "action_id": f"request_status_approve_{request['id']}"
-        }
-
-        deny_button = {
-            "type": "button",
-            "text": {
-                "type": "plain_text",
-                "text": "Deny"
-            },
-            "style": "danger",
-            "action_id": f"request_status_deny_{request['id']}"
-        }
-
-        delete_button = {
-            "type": "button",
-            "text": {
-                "type": "plain_text",
-                "text": "Delete"
-            },
-            "style": "danger",
-            "action_id": f"request_delete_{request['id']}"
-        }
-
-        payment_date = request['payment_date']
-        if not payment_date:
-            payment_date = "Wasn't approved yet."
-
-        request_item = {
-            "color": "#09ab19",
-            "blocks": [
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": f"Request #{request['id']}"
-                    }
-                },
-                {
-                    "type": "section",
-                    "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": f"*Creator:* {request['creator_name']}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": f"*Reviewer:* {request['reviewer_name']}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": f"*Bonus type:* {request['bonus_name']}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": f"*Payment amount:*  {request['payment_amount']}$"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": f"*Creation date:* {datetime_converter(request['created_at'])}\n"
-                                    f"*Payment date:* {date_converter(payment_date)}"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": f"*Description:* {request['description']}"
-                        }
-                    ]
-                },
-                {
-                    "type": "actions",
-                    "elements": [
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Changes history"
-                            },
-                            "action_id": f"request_history_{request['id']}"
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Edit"
-                            },
-                            "action_id": f"request_edit_{request['id']}"
-                        }
-                    ]
-                },
-            ]
-        }
-
-        if 'administrator' in user['roles'] or 'reviewer' in user['roles']:
-            request_item['blocks'][4]['elements'].append(approve_button)
-            request_item['blocks'][4]['elements'].append(deny_button)
-        elif 'worker' in user['roles']:
-            request_item['blocks'][4]['elements'].append(delete_button)
-
-        attachments.append(request_item)
-
-    attachments.append(back_to_request_start_menu_button)
-
-    return attachments
-
-
-def request_history_string(request_id):
-    return {
-        "color": "#008000",
-        "blocks": [
-            {
-                "type": "header",
-                "text": {
-                    "type": "plain_text",
-                    "text": f"History of request #{request_id}"
-                }
-            }
-        ]
-    }
-
-
-back_to_request_list_button = {
-    "color": "#008000",
-    "blocks": [
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Back"
-                    },
-                    "action_id": "request_list"
-                }
-            ]
-        }
-    ]
-}
-
-
-def generate_request_history_block_list(request_history_list):
-    """
-    request_history_list = [
-            {
-                'id': 1,
-                'request_id': 1,
-                'timestamp': '24-07-2022 14:22',
-                'editor': 'Name',
-                'changes': 'abc'
-            }
-        ]
-    """
-    attachments = [request_history_string(request_history_list[0].request_id)]
-
-    for request_history_event in request_history_list:
-        request_history_item = {
-            "color": "#09ab19",
-            "blocks": [
-                {
-                    "type": "section",
-                    "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": f"*Editor:* {request_history_event.editor}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": f"*When:* {datetime_converter(request_history_event.timestamp)}"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": f"*Changes:*\n{request_history_event.changes}"
-                    }
-                }
-            ]
-        }
-
-        attachments.append(request_history_item)
-
-    attachments.append(back_to_request_list_button)
-
-    return attachments
-
-
-def get_request_by_id(request_id, request_list):
-    for request in request_list:
-        if request['id'] == int(request_id):
-            return request
 
 
 def request_create_modal(user):

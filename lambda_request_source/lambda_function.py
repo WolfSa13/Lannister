@@ -44,17 +44,80 @@ def lambda_handler(event, context):
 
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
-    elif action_id == 'request_list':
+    elif action_id.startswith('request_list'):
         user = UsersQuery.get_user_by_slack_id(event['user']['id'])
-
-        request_list = authenticate_request_list(RequestQuery.get_requests(), user)
-
-        attachments = generate_request_block_list(request_list, user)
 
         data = {
             "response_type": 'in_channel',
-            "replace_original": False,
-            "attachments": attachments
+            "replace_original": False
+        }
+
+        if action_id == 'request_list':
+            if 'administrator' in user['roles']:
+                blocks = request_list_administrator_menu
+            elif 'reviewer' in user['roles']:
+                blocks = request_list_reviewer_menu
+            else:
+                blocks = worker_request_list_menu
+
+            data["blocks"] = blocks
+
+        elif action_id.startswith('request_list_worker'):
+            if action_id == 'request_list_worker_pending_unpaid_requests':
+                request_list = RequestQuery.get_worker_pending_unpaid_requests(user['id'])
+                data['attachments'] = generate_request_block_list(request_list, user, action_id)
+            elif action_id == 'request_list_worker_approved_denied_requests':
+                request_list = RequestQuery.get_worker_approved_denied_requests(user['id'])
+                data['attachments'] = generate_request_block_list(request_list, user, action_id)
+            elif action_id == 'request_list_worker_deleted_requests':
+                request_list = RequestQuery.get_worker_deleted_requests(user['id'])
+                data['attachments'] = generate_request_block_list(request_list, user, action_id)
+
+        elif action_id.startswith('request_list_reviewer'):
+            if action_id == 'request_list_reviewer_menu':
+                data['blocks'] = request_list_reviewer_menu
+            elif action_id == 'request_list_reviewer_requests':
+                if 'administrator' in user['roles']:
+                    data['blocks'] = request_list_administrator_requests
+                else:
+                    data['blocks'] = request_list_reviewer_requests
+            elif action_id == 'request_list_reviewer_to_review':
+                request_list = RequestQuery.get_filtered_requests(reviewer_id=user['id'])
+                data['attachments'] = generate_request_block_list(request_list, user, action_id)
+
+        elif action_id.startswith('request_list_administrator'):
+            if action_id == 'request_list_administrator_menu':
+                data['blocks'] = request_list_administrator_menu
+            elif action_id.startswith('request_list_administrator_all_requests'):
+                if action_id == 'request_list_administrator_all_requests':
+                    data['blocks'] = request_list_administrator_all_requests
+                else:
+                    query_name = action_id.split('_')[5]
+                    request_list = RequestQuery.get_administrator_all_requests(query_name)
+                    """
+                    action_id - something like "request_list_administrator_all_requests_pending"
+                    we get 6th word of it
+                    query_name must be:
+                        - "pending"
+                        - "unpaid"
+                        - "paid"
+                        - "denied"
+                        - "deleted"
+                    """
+                    data['attachments'] = generate_request_block_list(request_list, user, action_id)
+
+        response_url = event['response_url']
+
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + SLACK_BOT_TOKEN
+        }
+
+        requests.post(response_url, data=json.dumps(data), headers=headers)
+
+    elif action_id == 'request_message_delete':
+        data = {
+            "delete_original": "true"
         }
 
         response_url = event['response_url']

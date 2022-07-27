@@ -19,7 +19,7 @@ def get_main_menu_blocks(user_slack_id):
 
     start_menu = [
         {
-            "type": "section",
+            "type": "header",
             "text": {
                 "type": "plain_text",
                 "text": "Hi, I'm here. What do you want to do?"

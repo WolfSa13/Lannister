@@ -1,4 +1,7 @@
+import datetime
+
 import sqlalchemy as db
+from sqlalchemy import or_, and_
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import ColumnElement as ColElem
 import os
@@ -56,7 +59,6 @@ class RequestQuery:
 
         return 1
 
-
     @staticmethod
     def delete_request(request_id):
         with Session(engine) as session:
@@ -90,28 +92,133 @@ class RequestQuery:
     @staticmethod
     def get_filtered_requests(status=None, reviewer_id=None, creator_id=None, payment_date=None):
         with Session(engine) as session:
-            creator = db.orm.aliased(Users, 'creator')
-            reviewer = db.orm.aliased(Users, 'reviewer')
-            query = session.query(Requests, TypeBonuses, ColElem.label(creator.c.full_name, 'creator_name'),
+            creator = db.orm.aliased(Users)
+            reviewer = db.orm.aliased(Users)
+            query = session.query(Requests, ColElem.label(TypeBonuses.c.type, 'bonus_name'),
+                                  ColElem.label(creator.c.full_name, 'creator_name'),
                                   ColElem.label(creator.c.slack_id, 'creator_slack_id'),
                                   ColElem.label(reviewer.c.full_name, 'reviewer_name'),
-                                  ColElem.label(reviewer.c.slack_id, 'reviewer_slack_id')) \
-                .join(TypeBonuses, Requests.c.type_bonus == TypeBonuses.c.id) \
-                .join(creator, Requests.c.creator == creator.c.id) \
-                .join(reviewer, Requests.c.reviewer == reviewer.c.id)
-
+                                  ColElem.label(reviewer.c.slack_id, 'reviewer_slack_id')).order_by(Requests.columns.id)
             if status is not None:
-                query = query.filter(Requests.c.status == status)
-            if payment_date is not None:
-                query = query.filter(Requests.c.payment_date == payment_date)
-            if reviewer_id is not None:
-                query = query.filter(reviewer.c.slack_id == reviewer_id)
-            if creator_id is not None:
-                query = query.filter(creator.c.slack_id == creator_id)
+                query = query.filter(Requests.columns.id == status)
+            elif reviewer_id is not None:
+                query = query.filter(Requests.columns.reviewer == reviewer_id)
+            elif creator_id is not None:
+                query = query.filter(Requests.columns.creator == creator_id)
+            elif payment_date is not None:
+                query = query.filter(Requests.columns.payment_date == payment_date)
 
-            query_result = query.all()
+            query_result = query.join(TypeBonuses, Requests.c.type_bonus == TypeBonuses.c.id) \
+                .join(creator, Requests.c.creator == creator.c.id) \
+                .join(reviewer, Requests.c.reviewer == reviewer.c.id).all()
 
         return query_result
+
+    @staticmethod
+    def get_worker_pending_unpaid_requests(creator_id):
+        with Session(engine) as session:
+            creator = db.orm.aliased(Users)
+            reviewer = db.orm.aliased(Users)
+            query = session.query(Requests, ColElem.label(TypeBonuses.c.type, 'bonus_name'),
+                                  ColElem.label(creator.c.full_name, 'creator_name'),
+                                  ColElem.label(creator.c.slack_id, 'creator_slack_id'),
+                                  ColElem.label(reviewer.c.full_name, 'reviewer_name'),
+                                  ColElem.label(reviewer.c.slack_id, 'reviewer_slack_id')).order_by(Requests.columns.id)
+
+            today = datetime.datetime.today()
+            today = f'{today.year}-{today.month}-{today.day}'
+
+            query = query.filter(or_(Requests.columns.status == 'created',
+                                     and_(Requests.columns.status == 'approved',
+                                          Requests.columns.payment_date >= today)))
+            query = query.filter(Requests.columns.creator == creator_id)
+
+            query_result = query.join(TypeBonuses, Requests.c.type_bonus == TypeBonuses.c.id) \
+                .join(creator, Requests.c.creator == creator.c.id) \
+                .join(reviewer, Requests.c.reviewer == reviewer.c.id).all()
+
+            return query_result
+
+    @staticmethod
+    def get_worker_approved_denied_requests(creator_id):
+        with Session(engine) as session:
+            creator = db.orm.aliased(Users)
+            reviewer = db.orm.aliased(Users)
+            query = session.query(Requests, ColElem.label(TypeBonuses.c.type, 'bonus_name'),
+                                  ColElem.label(creator.c.full_name, 'creator_name'),
+                                  ColElem.label(creator.c.slack_id, 'creator_slack_id'),
+                                  ColElem.label(reviewer.c.full_name, 'reviewer_name'),
+                                  ColElem.label(reviewer.c.slack_id, 'reviewer_slack_id')).order_by(Requests.columns.id)
+
+            today = datetime.datetime.today()
+            today = f'{today.year}-{today.month}-{today.day}'
+
+            query = query.filter(or_(Requests.columns.status == 'denied',
+                                     and_(Requests.columns.status == 'approved',
+                                          Requests.columns.payment_date < today)))
+            query = query.filter(Requests.columns.creator == creator_id)
+
+            query_result = query.join(TypeBonuses, Requests.c.type_bonus == TypeBonuses.c.id) \
+                .join(creator, Requests.c.creator == creator.c.id) \
+                .join(reviewer, Requests.c.reviewer == reviewer.c.id).all()
+
+            return query_result
+
+    @staticmethod
+    def get_worker_deleted_requests(creator_id):
+        with Session(engine) as session:
+            creator = db.orm.aliased(Users)
+            reviewer = db.orm.aliased(Users)
+            query = session.query(Requests, ColElem.label(TypeBonuses.c.type, 'bonus_name'),
+                                  ColElem.label(creator.c.full_name, 'creator_name'),
+                                  ColElem.label(creator.c.slack_id, 'creator_slack_id'),
+                                  ColElem.label(reviewer.c.full_name, 'reviewer_name'),
+                                  ColElem.label(reviewer.c.slack_id, 'reviewer_slack_id')).order_by(Requests.columns.id)
+
+            query = query.filter(Requests.columns.status == 'deleted')
+            query = query.filter(Requests.columns.creator == creator_id)
+
+            query_result = query.join(TypeBonuses, Requests.c.type_bonus == TypeBonuses.c.id) \
+                .join(creator, Requests.c.creator == creator.c.id) \
+                .join(reviewer, Requests.c.reviewer == reviewer.c.id).all()
+
+            return query_result
+
+    @staticmethod
+    def get_administrator_all_requests(query_name):
+        with Session(engine) as session:
+            creator = db.orm.aliased(Users)
+            reviewer = db.orm.aliased(Users)
+            query = session.query(Requests, ColElem.label(TypeBonuses.c.type, 'bonus_name'),
+                                  ColElem.label(creator.c.full_name, 'creator_name'),
+                                  ColElem.label(creator.c.slack_id, 'creator_slack_id'),
+                                  ColElem.label(reviewer.c.full_name, 'reviewer_name'),
+                                  ColElem.label(reviewer.c.slack_id, 'reviewer_slack_id')).order_by(Requests.columns.id)
+
+            if query_name == 'pending':
+                query = query.filter(Requests.columns.status == 'created')
+            elif query_name == 'unpaid':
+                today = datetime.datetime.today()
+                today = f'{today.year}-{today.month}-{today.day}'
+
+                query = query.filter(and_(Requests.columns.status == 'approved',
+                                          Requests.columns.payment_date >= today))
+            elif query_name == 'paid':
+                today = datetime.datetime.today()
+                today = f'{today.year}-{today.month}-{today.day}'
+
+                query = query.filter(and_(Requests.columns.status == 'approved',
+                                          Requests.columns.payment_date < today))
+            elif query_name == 'denied':
+                query = query.filter(Requests.columns.status == 'denied')
+            elif query_name == 'deleted':
+                query = query.filter(Requests.columns.status == 'deleted')
+
+            query_result = query.join(TypeBonuses, Requests.c.type_bonus == TypeBonuses.c.id) \
+                .join(creator, Requests.c.creator == creator.c.id) \
+                .join(reviewer, Requests.c.reviewer == reviewer.c.id).all()
+
+            return query_result
 
 
 class UsersQuery:
