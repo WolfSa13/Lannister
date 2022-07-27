@@ -90,14 +90,14 @@ def lambda_handler(event, context):
         slack_id_block_id = event['body']['view']['blocks'][3]['block_id']
         slack_id = event['body']['view']['state']['values'][slack_id_block_id]['slack_id_input']['value']
 
-        data = {
+        new_user_data = {
             'full_name': full_name,
             'position': position,
             'roles': roles,
             'slack_id': slack_id
         }
 
-        users_created = UsersQuery.add_new_user(data)
+        users_created = UsersQuery.add_new_user(new_user_data)
         blocks = [error_message]
 
         if users_created:
@@ -117,6 +117,35 @@ def lambda_handler(event, context):
         }
 
         requests.post(response_url, data=json.dumps(data), headers=headers)
+
+    elif action_id == 'worker_team_join':
+        print('worker_team_join')
+        print(event)
+        new_user_data = {
+            'full_name': event['user']['real_name'],
+            'roles': [1],
+            'slack_id': event['user']['id']
+        }
+
+        users_created = UsersQuery.add_new_user(new_user_data)
+
+        if users_created:
+            blocks = [new_team_member_greeting]
+
+            message_data = {
+                "token": SLACK_BOT_TOKEN,
+                'channel': event['user']['id'],
+                "blocks": blocks
+            }
+
+            response_url = 'https://slack.com/api/chat.postMessage'
+
+            headers = {
+                'Content-type': 'application/json',
+                "Authorization": "Bearer " + SLACK_BOT_TOKEN
+            }
+
+            requests.post(response_url, data=json.dumps(message_data), headers=headers)
 
     # modal window for edit user profile
     elif action_id.startswith("worker_edit"):
