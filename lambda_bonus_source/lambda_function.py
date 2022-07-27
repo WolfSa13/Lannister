@@ -3,7 +3,7 @@ import requests
 import os
 
 from message_services import *
-from orm_services import TypeBonusesQuery
+from orm_services import TypeBonusesQuery, UsersQuery
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 
@@ -13,17 +13,19 @@ def lambda_handler(event, context):
     example_event = {
         'response_url': 'url',
         "trigger_id": body['trigger_id'],
-        'action_id': action_id
+        'action_id': action_id,
+        'user': body['user']
     }
     """
 
     action_id = event['action_id']
 
     if action_id.startswith('bonus_list'):
+        user = UsersQuery.get_user_by_slack_id(event['user']['id'])
 
         bonus_list = TypeBonusesQuery.get_bonuses()
 
-        attachments = generate_bonus_block_list(bonus_list)
+        attachments = generate_bonus_block_list(bonus_list, user)
 
         data = {
             "response_type": 'in_channel',
@@ -54,10 +56,11 @@ def lambda_handler(event, context):
 
     # button responsible for returning to the start menu
     elif action_id.startswith('bonus_start_menu'):
+        user = UsersQuery.get_user_by_slack_id(event['user']['id'])
         data = {
             "response_type": 'in_channel',
             "replace_original": False,
-            "blocks": bonus_start_menu
+            "blocks": bonus_start_menu(user)
         }
 
         response_url = event['response_url']

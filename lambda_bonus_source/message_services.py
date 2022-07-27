@@ -1,12 +1,4 @@
-def get_bonus_by_id(bonus_id, bonus_list):
-    for bonus in bonus_list:
-        if bonus['id'] == bonus_id:
-            return bonus
-
-    return None
-
-
-def generate_bonus_block_list(bonus_list):
+def generate_bonus_block_list(bonus_list, user):
     attachments = []
 
     for bonus in bonus_list:
@@ -28,31 +20,34 @@ def generate_bonus_block_list(bonus_list):
                             "text": f"*Description:* {bonus['description']}"
                         }
                     ]
-                },
-                {
-                    "type": "actions",
-                    "elements": [
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Edit"
-                            },
-                            "action_id": f"bonus_edit_{bonus['id']}"
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Delete"
-                            },
-                            "style": "danger",
-                            "action_id": f"bonus_delete_{bonus['id']}"
-                        }
-                    ]
                 }
             ]
         }
+
+        if 'administrator' in user['roles']:
+            admin_buttons = {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Edit"
+                        },
+                        "action_id": f"bonus_edit_{bonus['id']}"
+                    },
+                    {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Delete"
+                        },
+                        "style": "danger",
+                        "action_id": f"bonus_delete_{bonus['id']}"
+                    }
+                ]
+            }
+            bonus_item['blocks'].append(admin_buttons)
 
         attachments.append(bonus_item)
 
@@ -96,47 +91,55 @@ error_message = {
     }
 }
 
-bonus_start_menu = [
-    {
-        "type": "header",
-        "text": {
-            "type": "plain_text",
-            "text": "Bonuses"
-        }
-    },
-    {
-        "type": "divider"
-    },
-    {
-        "type": "actions",
-        "elements": [
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Bonus List"
-                },
-                "action_id": "bonus_list"
-            },
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Create bonus"
-                },
-                "action_id": "bonus_create"
-            },
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Return to main menu"
-                },
-                "action_id": "start_menu"
+
+def bonus_start_menu(user):
+    bonus_start_menu_const = [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "Bonuses"
             }
-        ]
-    }
-]
+        },
+        {
+            "type": "divider"
+        },
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Bonus List"
+                    },
+                    "action_id": "bonus_list"
+                },
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Return to main menu"
+                    },
+                    "action_id": "start_menu"
+                }
+            ]
+        }
+    ]
+
+    if 'administrator' in user['roles']:
+        create_button = {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Create bonus"
+            },
+            "action_id": "bonus_create"
+        }
+        bonus_start_menu_const[2]['elements'].insert(1, create_button)
+
+    return bonus_start_menu_const
+
 
 back_to_bonus_start_menu_button = {
     "color": "#008000",

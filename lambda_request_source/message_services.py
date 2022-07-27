@@ -215,10 +215,39 @@ def request_denied_successfully():
     ]
 
 
-def generate_request_block_list(request_list):
+def generate_request_block_list(request_list, user):
     attachments = []
 
     for request in request_list:
+        approve_button = {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Approve"
+            },
+            "style": "primary",
+            "action_id": f"request_status_approve_{request['id']}"
+        }
+
+        deny_button = {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Deny"
+            },
+            "style": "danger",
+            "action_id": f"request_status_deny_{request['id']}"
+        }
+
+        delete_button = {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Delete"
+            },
+            "style": "danger",
+            "action_id": f"request_delete_{request['id']}"
+        }
 
         payment_date = request['payment_date']
         if not payment_date:
@@ -289,41 +318,21 @@ def generate_request_block_list(request_list):
                             "type": "button",
                             "text": {
                                 "type": "plain_text",
-                                "text": "Approve"
-                            },
-                            "style": "primary",
-                            "action_id": f"request_status_approve_{request['id']}"
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Deny"
-                            },
-                            "style": "danger",
-                            "action_id": f"request_status_deny_{request['id']}"
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
                                 "text": "Edit"
                             },
                             "action_id": f"request_edit_{request['id']}"
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Delete"
-                            },
-                            "style": "danger",
-                            "action_id": f"request_delete_{request['id']}"
                         }
                     ]
                 },
             ]
         }
+
+        if 'administrator' in user['roles'] or 'reviewer' in user['roles']:
+            request_item['blocks'][4]['elements'].append(approve_button)
+            request_item['blocks'][4]['elements'].append(deny_button)
+        elif 'worker' in user['roles']:
+            request_item['blocks'][4]['elements'].append(delete_button)
+
         attachments.append(request_item)
 
     attachments.append(back_to_request_start_menu_button)
@@ -420,13 +429,16 @@ def get_request_by_id(request_id, request_list):
             return request
 
 
-def request_create_modal():
+def request_create_modal(user):
     reviewer_list = UsersQuery.get_reviewers()
 
     bonus_list = TypeBonusesQuery.get_bonuses()
 
     reviewer_options = []
     for reviewer in reviewer_list:
+        if user['id'] == reviewer['id']:
+            continue
+
         reviewer_item = {
             "text": {
                 "type": "plain_text",
@@ -534,7 +546,7 @@ def request_create_modal():
     }
 
 
-def request_edit_modal(request):
+def request_edit_modal(request, user):
     reviewer_list = UsersQuery.get_reviewers()
     for reviewer in reviewer_list:
         if reviewer['id'] == request['reviewer']:
@@ -549,6 +561,9 @@ def request_edit_modal(request):
 
     reviewer_options = []
     for reviewer in reviewer_list:
+        if user['id'] == reviewer['id']:
+            continue
+
         reviewer_item = {
             "text": {
                 "type": "plain_text",

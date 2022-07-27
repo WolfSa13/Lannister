@@ -12,7 +12,12 @@ RESPONSE_URL = 'https://slack.com/api/views.open'
 def lambda_handler(event, context):
     action_id = event['action_id']
 
-    if action_id == "worker_start_menu":
+    if action_id == "worker_get":
+        user = UsersQuery.get_user_by_slack_id(event['user_slack_id'])
+
+        return user
+
+    elif action_id == "worker_start_menu":
         data = {
             "response_type": 'in_channel',
             "replace_original": False,

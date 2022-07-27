@@ -12,8 +12,6 @@ STATUS_CODE_200 = {
 
 
 def lambda_handler(event, context):
-    print('Event')
-    print(event)
     body = event['body']
     isBase64Encoded = event['isBase64Encoded']
 
@@ -40,7 +38,8 @@ def lambda_handler(event, context):
         invoke_lambda(function_name, data)
 
     if 'command' in body and body['command'] == '/start':
-        respond_with_menu(body['response_url'])
+        user_slack_id = body['user_id']
+        respond_with_menu(body['response_url'], user_slack_id)
 
     # when the button was clicked in the chat
     elif body['type'] == 'block_actions' and 'response_url' in body:
@@ -49,7 +48,8 @@ def lambda_handler(event, context):
 
         # when 'Return to main menu' button was clicked
         if action_id.startswith('start'):
-            respond_with_menu(body['response_url'])
+            user_slack_id = body['user']['id']
+            respond_with_menu(body['response_url'], user_slack_id)
 
             return STATUS_CODE_200
         # check if correct action_id was sent

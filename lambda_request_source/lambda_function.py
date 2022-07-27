@@ -8,6 +8,23 @@ from orm_services import RequestQuery, UsersQuery, RequestHistoryQuery
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 
 
+def authenticate_request_list(request_list, user):
+    return_list = []
+    for request in request_list:
+        if request['creator'] == user['id']:
+            return_list.append(request)
+
+    if 'administrator' in user['roles']:
+        return request_list
+    elif 'reviewer' in user['roles']:
+        for request in request_list:
+            if request['reviewer'] == user['id']:
+                if request not in return_list:
+                    return_list.append(request)
+
+    return return_list
+
+
 def lambda_handler(event, context):
     action_id = event['action_id']
 
@@ -28,10 +45,11 @@ def lambda_handler(event, context):
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id == 'request_list':
+        user = UsersQuery.get_user_by_slack_id(event['user']['id'])
 
-        request_list = RequestQuery.get_requests()
+        request_list = authenticate_request_list(RequestQuery.get_requests(), user)
 
-        attachments = generate_request_block_list(request_list)
+        attachments = generate_request_block_list(request_list, user)
 
         data = {
             "response_type": 'in_channel',
@@ -49,9 +67,10 @@ def lambda_handler(event, context):
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id == 'request_create':
+        user = UsersQuery.get_user_by_slack_id(event['user']['id'])
         data = {
             "trigger_id": event['trigger_id'],
-            "view": request_create_modal()
+            "view": request_create_modal(user)
         }
 
         response_url = 'https://slack.com/api/views.open'
@@ -64,13 +83,14 @@ def lambda_handler(event, context):
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('request_edit'):
+        user = UsersQuery.get_user_by_slack_id(event['user']['id'])
         request_id = int(action_id.split('_')[2])
 
         request = RequestQuery.get_requests(request_id)[0]
 
         data = {
             "trigger_id": event['trigger_id'],
-            "view": request_edit_modal(request)
+            "view": request_edit_modal(request, user)
         }
 
         response_url = 'https://slack.com/api/views.open'
