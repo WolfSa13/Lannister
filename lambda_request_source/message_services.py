@@ -57,7 +57,7 @@ back_to_request_start_menu_button = {
                         "type": "plain_text",
                         "text": "Back"
                     },
-                    "action_id": "request_start_menu"
+                    "action_id": "request_list"
                 }
             ]
         }
@@ -66,7 +66,7 @@ back_to_request_start_menu_button = {
 
 start_menu = [
     {
-        "type": "section",
+        "type": "header",
         "text": {
             "type": "plain_text",
             "text": "Hi, I'm here. What do you want to do?"
@@ -105,6 +105,67 @@ start_menu = [
         ]
     }
 ]
+
+
+worker_request_list_menu = [
+    {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Requests list"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
+        "type": "actions",
+        "elements": [
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Pending and unpaid yet"
+                },
+                "action_id": "request_list_worker_pending_unpaid_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Paid and denied"
+                },
+                "action_id": "request_list_worker_approved_denied_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Deleted"
+                },
+                "action_id": "request_list_worker_deleted_requests"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Back"
+                },
+                "action_id": "request_start_menu"
+            }
+        ]
+    }
+]
+
+
+def request_list_menu(user):
+    if 'administrator' in user['roles']:
+        pass
+    elif 'reviewer' in user['roles']:
+        pass
+    else:
+        blocks = worker_request_list_menu
+        return blocks
 
 
 def request_created_successfully_reviewer(creator_name):
@@ -215,7 +276,7 @@ def request_denied_successfully():
     ]
 
 
-def generate_request_block_list(request_list, user):
+def generate_editable_request_block_list(request_list, user):
     attachments = []
 
     for request in request_list:
@@ -332,6 +393,83 @@ def generate_request_block_list(request_list, user):
             request_item['blocks'][4]['elements'].append(deny_button)
         elif 'worker' in user['roles']:
             request_item['blocks'][4]['elements'].append(delete_button)
+
+        attachments.append(request_item)
+
+    attachments.append(back_to_request_start_menu_button)
+
+    return attachments
+
+
+def generate_uneditable_request_block_list(request_list, user):
+    attachments = []
+
+    for request in request_list:
+        request_item = {
+            "color": "#09ab19",
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"Request #{request['id']}"
+                    }
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Creator:* {request['creator_name']}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Reviewer:* {request['reviewer_name']}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Bonus type:* {request['bonus_name']}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Payment amount:*  {request['payment_amount']}$"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Creation date:* {datetime_converter(request['created_at'])}\n"
+                                    f"*Payment date:* {date_converter(request['payment_date'])}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Description:* {request['description']}"
+                        }
+                    ]
+                },
+                {
+                    "type": "actions",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Changes history"
+                            },
+                            "action_id": f"request_history_{request['id']}"
+                        }
+                    ]
+                },
+            ]
+        }
 
         attachments.append(request_item)
 

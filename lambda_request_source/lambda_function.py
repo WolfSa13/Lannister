@@ -47,9 +47,36 @@ def lambda_handler(event, context):
     elif action_id == 'request_list':
         user = UsersQuery.get_user_by_slack_id(event['user']['id'])
 
-        request_list = authenticate_request_list(RequestQuery.get_requests(), user)
+        data = {
+            "response_type": 'in_channel',
+            "replace_original": False,
+            "blocks": request_list_menu(user)
+        }
 
-        attachments = generate_request_block_list(request_list, user)
+        response_url = event['response_url']
+
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + SLACK_BOT_TOKEN
+        }
+
+        requests.post(response_url, data=json.dumps(data), headers=headers)
+
+    elif action_id.startswith('request_list_'):
+        user = UsersQuery.get_user_by_slack_id(event['user']['id'])
+        if action_id.startswith('request_list_worker'):
+            if action_id == 'request_list_worker_pending_unpaid_requests':
+                # request_list = RequestQuery.get_worker_pending_unpaid_requests(user)
+                request_list = RequestQuery.get_requests()
+                attachments = generate_editable_request_block_list(request_list, user)
+            elif action_id == 'request_list_worker_approved_denied_requests':
+                # request_list = RequestQuery.get_worker_approved_denied_requests(user)
+                request_list = RequestQuery.get_requests()
+                attachments = generate_uneditable_request_block_list(request_list, user)
+            elif action_id == 'request_list_worker_deleted_requests':
+                # request_list = RequestQuery.get_worker_deleted_requests(user)
+                request_list = RequestQuery.get_requests()
+                attachments = generate_uneditable_request_block_list(request_list, user)
 
         data = {
             "response_type": 'in_channel',
