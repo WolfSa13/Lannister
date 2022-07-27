@@ -22,6 +22,7 @@ roles_options = [
     }
 ]
 
+
 def get_user_by_id(user_id, users_list):
     for user in users_list:
         if user['id'] == int(user_id):
@@ -243,6 +244,7 @@ def worker_edit_modal(user):
         ]
     }
 
+
 error_message = {
     "type": "section",
     "text": {
@@ -257,7 +259,7 @@ def user_created_successfully(full_name):
         "type": "section",
         "text": {
             "type": "plain_text",
-             "text": f"User {full_name} was created successfuly."
+            "text": f"User {full_name} was created successfuly."
         }
     }
 
@@ -337,6 +339,14 @@ back_to_user_start_menu_button = {
             ]
         }
     ]
+}
+
+new_team_member_greeting = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": "Welcome to the COXIT team!\nI am Lannister. To start work with me use the /start command"
+    }
 }
 
 

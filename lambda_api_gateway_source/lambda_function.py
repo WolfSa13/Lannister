@@ -1,3 +1,5 @@
+import json
+
 from utils import base64_encoder, resolve_function_name, invoke_lambda
 from message_services import respond_with_error_return_menu, respond_with_menu
 
@@ -10,6 +12,7 @@ STATUS_CODE_200 = {
 
 
 def lambda_handler(event, context):
+    print('Event')
     print(event)
     body = event['body']
     isBase64Encoded = event['isBase64Encoded']
@@ -17,8 +20,25 @@ def lambda_handler(event, context):
     # check if event body was decoded
     if isBase64Encoded:
         body = base64_encoder(body)
+    else:
+        body = json.loads(body)
+    print('Body')
+    print(body)
 
     # when the command was called in the chat
+    if 'challenge' in body:
+        return body
+
+    if 'event' in body and body['event']['type'] == 'team_join':
+        function_name = resolve_function_name('worker')
+
+        data = {
+            "user": body['event']['user'],
+            "action_id": 'worker_team_join'
+        }
+
+        invoke_lambda(function_name, data)
+
     if 'command' in body and body['command'] == '/start':
         respond_with_menu(body['response_url'])
 
