@@ -29,7 +29,7 @@ def lambda_handler(event, context):
 
         data = {
             "response_type": 'in_channel',
-            "replace_original": False,
+            "replace_original": True,
             "attachments": attachments
         }
 
@@ -59,7 +59,7 @@ def lambda_handler(event, context):
         user = UsersQuery.get_user_by_slack_id(event['user']['id'])
         data = {
             "response_type": 'in_channel',
-            "replace_original": False,
+            "replace_original": True,
             "blocks": bonus_start_menu(user)
         }
 
@@ -95,18 +95,17 @@ def lambda_handler(event, context):
 
         bonus_deleted = TypeBonusesQuery.delete_bonuses(bonus_id)
 
-        blocks = [error_message]
+        view = bonus_error_modal()
 
         if bonus_deleted:
-            blocks = [bonus_deleted_successfully]
+            view = bonus_deleted_successfully_modal
 
         data = {
-            'token': SLACK_BOT_TOKEN,
-            'channel': event['user']['id'],
-            "blocks": blocks
+            "trigger_id": event['trigger_id'],
+            "view": view
         }
 
-        response_url = 'https://slack.com/api/chat.postMessage'
+        response_url = 'https://slack.com/api/views.open'
 
         headers = {
             'Content-type': 'application/json',
@@ -138,18 +137,17 @@ def lambda_handler(event, context):
 
         bonus_created = TypeBonusesQuery.add_new_bonus(data)
 
-        blocks = [error_message]
+        view = bonus_error_modal()
 
         if bonus_created:
-            blocks = [bonus_created_successfully(bonus_name)]
+            view = bonus_created_successfully_modal(data)
 
         data = {
-            'token': SLACK_BOT_TOKEN,
-            'channel': event['body']['user']['id'],
-            "blocks": blocks
+            "trigger_id": event['body']['trigger_id'],
+            "view": view
         }
 
-        response_url = 'https://slack.com/api/chat.postMessage'
+        response_url = 'https://slack.com/api/views.open'
 
         headers = {
             'Content-type': 'application/json',
@@ -177,18 +175,17 @@ def lambda_handler(event, context):
 
         bonus_updated = TypeBonusesQuery.update_bonuses(bonus_id, data)
 
-        blocks = [error_message]
+        view = bonus_error_modal()
 
         if bonus_updated:
-            blocks = [bonus_edited_successfully]
+            view = bonus_edited_successfully_modal(data)
 
         data = {
-            'token': SLACK_BOT_TOKEN,
-            'channel': event['body']['user']['id'],
-            "blocks": blocks
+            "trigger_id": event['body']['trigger_id'],
+            "view": view
         }
 
-        response_url = 'https://slack.com/api/chat.postMessage'
+        response_url = 'https://slack.com/api/views.open'
 
         headers = {
             'Content-type': 'application/json',

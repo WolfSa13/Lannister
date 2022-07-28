@@ -31,7 +31,7 @@ def lambda_handler(event, context):
     if action_id == 'request_start_menu':
         data = {
             "response_type": 'in_channel',
-            "replace_original": False,
+            "replace_original": True,
             "blocks": request_start_menu
         }
 
@@ -49,7 +49,7 @@ def lambda_handler(event, context):
 
         data = {
             "response_type": 'in_channel',
-            "replace_original": False
+            "replace_original": True
         }
 
         if action_id == 'request_list':
@@ -82,7 +82,7 @@ def lambda_handler(event, context):
                 else:
                     data['blocks'] = request_list_reviewer_requests
             elif action_id == 'request_list_reviewer_to_review':
-                request_list = RequestQuery.get_filtered_requests(reviewer_id=user['id'])
+                request_list = RequestQuery.get_filtered_requests(reviewer_id=user['id'], status='created')
                 data['attachments'] = generate_request_block_list(request_list, user, action_id)
 
         elif action_id.startswith('request_list_administrator'):
@@ -193,6 +193,14 @@ def lambda_handler(event, context):
         editor_slack_id = event['user']['id']
         editor = UsersQuery.get_user_by_slack_id(editor_slack_id)
 
+        response_url_message = 'https://slack.com/api/chat.postMessage'
+        response_url_modal = 'https://slack.com/api/views.open'
+
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + SLACK_BOT_TOKEN
+        }
+
         if action_id.split('_')[2] == "approve":
             status = 'approved'
         else:
@@ -202,69 +210,61 @@ def lambda_handler(event, context):
             'status': status
         }
 
-        old_request = RequestQuery.get_requests(request_id=request_id)[0]
-        result = RequestQuery.update_request(request_id, data)
+        request_updated = RequestQuery.update_request(request_id, data)
 
-        if result != 0:
+        view = request_error_modal
+
+        if request_updated:
+            old_request = RequestQuery.get_requests(request_id=request_id)[0]
             RequestHistoryQuery.add_history(data, request_id=request_id, editor=editor['full_name'],
                                             old_request=old_request)
-
-        response_url = 'https://slack.com/api/chat.postMessage'
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
-        blocks = request_approved_successfully()
-        data_editor_massage = {
-            'token': SLACK_BOT_TOKEN,
-            "blocks": blocks
-        }
-
-        blocks = request_change_successfully(request_id)
-        data_information_massage = {
-            'token': SLACK_BOT_TOKEN,
-            "blocks": blocks
-        }
-
-        if result == 1:
             request = RequestQuery.get_requests(request_id)[0]
 
-            if editor_slack_id == request['creator_slack_id']:
-                data_information_massage['channel'] = request['reviewer_slack_id']
-                data_editor_massage['channel'] = request['creator_slack_id']
-            elif editor_slack_id == request['reviewer_slack_id']:
-                data_information_massage['channel'] = request['creator_slack_id']
-                data_editor_massage['channel'] = request['reviewer_slack_id']
+            view = request_status_changed_successfully_modal(request_id, data)
+            data_reviewer_massage = {
+                "trigger_id": event['trigger_id'],
+                "view": view
+            }
 
-            requests.post(response_url, data=json.dumps(data_editor_massage), headers=headers)
+            blocks = request_status_changed_successfully(request_id, data)
+            data_creator_massage = {
+                'token': SLACK_BOT_TOKEN,
+                "blocks": blocks,
+                'channel': request['creator_slack_id']
+            }
 
-            requests.post(response_url, data=json.dumps(data_information_massage), headers=headers)
+            requests.post(response_url_modal, data=json.dumps(data_reviewer_massage), headers=headers)
+
+            requests.post(response_url_message, data=json.dumps(data_creator_massage), headers=headers)
 
         else:
-            blocks = request_error_edit()
             data_error_message = {
-                'token': SLACK_BOT_TOKEN,
-                'channel': editor_slack_id,
-                'blocks': blocks
+                "trigger_id": event['trigger_id'],
+                'view': view
             }
-            requests.post(response_url, data=json.dumps(data_error_message), headers=headers)
+            requests.post(response_url_modal, data=json.dumps(data_error_message), headers=headers)
 
     elif action_id.startswith('request_delete_'):
+
         request_id = int(action_id.split('_')[2])
 
-        RequestQuery.delete_request(request_id)
-
-        blocks = request_deleted_successfully()
-
         data = {
-            'token': SLACK_BOT_TOKEN,
-            'channel': event['user']['id'],
-            "blocks": blocks
+            'status': 'deleted'
         }
 
-        response_url = 'https://slack.com/api/chat.postMessage'
+        request_deleted = RequestQuery.update_request(request_id, data)
+
+        view = request_error_modal
+
+        if request_deleted:
+            view = request_deleted_successfully_modal(request_id)
+
+        data = {
+            "trigger_id": event['trigger_id'],
+            "view": view
+        }
+
+        response_url = 'https://slack.com/api/views.open'
 
         headers = {
             'Content-type': 'application/json',
@@ -319,52 +319,48 @@ def lambda_handler(event, context):
             'status': 'created'
         }
 
-        result = RequestQuery.add_new_request(data)
-
-        if result != 0:
-            data['reviewer_name'] = reviewer_name.replace('+', ' ')
-            data['bonus_name'] = bonus_type_name.replace('+', ' ')
-            RequestHistoryQuery.add_history(data, request_id=result, editor=creator['full_name'])
-
-        response_url = 'https://slack.com/api/chat.postMessage'
+        request_id = RequestQuery.add_new_request(data)
+        response_url_message = 'https://slack.com/api/chat.postMessage'
+        response_url_modal = 'https://slack.com/api/views.open'
 
         headers = {
             'Content-type': 'application/json',
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        if result != 0:
+        view = request_error_modal
+
+        if request_id != 0:
+            data['reviewer_name'] = reviewer_name.replace('+', ' ')
+            data['bonus_name'] = bonus_type_name.replace('+', ' ')
+
+            RequestHistoryQuery.add_history(data, request_id=request_id, editor=creator['full_name'])
+
             reviewer = UsersQuery.get_user_by_id(int(reviewer_id))
-            channel_id = reviewer['slack_id']
+            reviewer_channel_id = reviewer['slack_id']
 
             creator_name = creator['full_name']
             blocks = request_created_successfully_reviewer(creator_name)
             data_reviewer_message = {
                 'token': SLACK_BOT_TOKEN,
-                'channel': channel_id,
+                'channel': reviewer_channel_id,
                 "blocks": blocks
             }
-            requests.post(response_url, data=json.dumps(data_reviewer_message), headers=headers)
+            requests.post(response_url_message, data=json.dumps(data_reviewer_message), headers=headers)
 
-            blocks = request_created_successfully()
-            data_creator_message = {
-                'token': SLACK_BOT_TOKEN,
-                'channel': creator_slack_id,
-                'blocks': blocks
+            view = request_created_successfully_modal(request_id)
+            data_creator_modal = {
+                "trigger_id": event['body']['trigger_id'],
+                'view': view
             }
-            requests.post(response_url, data=json.dumps(data_creator_message), headers=headers)
+            requests.post(response_url_modal, data=json.dumps(data_creator_modal), headers=headers)
 
         else:
-            creator = UsersQuery.get_user_by_slack_id(creator_slack_id)[0]
-            channel_id = creator['slack_id']
-            blocks = request_not_created()
-            data_error_message = {
-                'token': SLACK_BOT_TOKEN,
-                'channel': channel_id,
-                'blocks': blocks
+            data_creator_modal = {
+                "trigger_id": event['body']['trigger_id'],
+                'view': view
             }
-
-            requests.post(response_url, data=json.dumps(data_error_message), headers=headers)
+            requests.post(response_url_modal, data=json.dumps(data_creator_modal), headers=headers)
 
     elif action_id.startswith('request_modal_edit'):
         request_id = int(action_id.split('_')[3])
@@ -411,54 +407,50 @@ def lambda_handler(event, context):
         }
 
         old_request = RequestQuery.get_requests(request_id=request_id)[0]
-        result = RequestQuery.update_request(request_id, data)
+        request_updated = RequestQuery.update_request(request_id, data)
 
-        if result != 0:
-            data['reviewer_name'] = reviewer_name.replace('+', ' ')
-            data['bonus_name'] = bonus_type_name.replace('+', ' ')
-            RequestHistoryQuery.add_history(data, request_id=request_id, editor=creator['full_name'],
-                                            old_request=old_request)
-
-        response_url = 'https://slack.com/api/chat.postMessage'
+        response_url_message = 'https://slack.com/api/chat.postMessage'
+        response_url_modal = 'https://slack.com/api/views.open'
 
         headers = {
             'Content-type': 'application/json',
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        blocks = request_edited_successfully()
-        data_editor_massage = {
-            'token': SLACK_BOT_TOKEN,
-            "blocks": blocks
-        }
+        view = request_error_modal
 
-        blocks = request_change_successfully(request_id)
-        data_information_massage = {
-            'token': SLACK_BOT_TOKEN,
-            "blocks": blocks
+        if request_updated:
+            data['reviewer_name'] = reviewer_name.replace('+', ' ')
+            data['bonus_name'] = bonus_type_name.replace('+', ' ')
+            RequestHistoryQuery.add_history(data, request_id=request_id, editor=creator['full_name'],
+                                            old_request=old_request)
 
-        }
+            view = request_edited_successfully_modal(request_id)
+            data_editor_modal = {
+                "trigger_id": event['body']['trigger_id'],
+                "view": view
+            }
 
-        if result == 1:
+            blocks = request_change_successfully(request_id)
+            data_information_massage = {
+                'token': SLACK_BOT_TOKEN,
+                "blocks": blocks
+            }
             request = RequestQuery.get_requests(request_id)[0]
 
             if editor_slack_id == request['creator_slack_id']:
                 data_information_massage['channel'] = request['reviewer_slack_id']
-                data_editor_massage['channel'] = request['creator_slack_id']
             elif editor_slack_id == request['reviewer_slack_id']:
                 data_information_massage['channel'] = request['creator_slack_id']
-                data_editor_massage['channel'] = request['reviewer_slack_id']
 
-            requests.post(response_url, data=json.dumps(data_editor_massage), headers=headers)
+            requests.post(response_url_modal, data=json.dumps(data_editor_modal), headers=headers)
 
-            requests.post(response_url, data=json.dumps(data_information_massage), headers=headers)
+            requests.post(response_url_message, data=json.dumps(data_information_massage), headers=headers)
 
         else:
-
-            blocks = request_error_edit()
-            data_error_message = {
-                'token': SLACK_BOT_TOKEN,
-                'channel': editor_slack_id,
-                'blocks': blocks
+            data = {
+                "trigger_id": event['body']['trigger_id'],
+                "view": view
             }
-            requests.post(response_url, data=json.dumps(data_error_message), headers=headers)
+
+            requests.post(response_url_modal, data=json.dumps(data), headers=headers)

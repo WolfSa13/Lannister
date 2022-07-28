@@ -354,96 +354,87 @@ request_list_administrator_all_requests = [
 ]
 
 back_to_request_start_menu_button = {
-    "color": "#008000",
-    "blocks": [
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Back"
-                    },
-                    "action_id": "request_list"
-                }
-            ]
-        }
-    ]
+    "type": "button",
+    "text": {
+        "type": "plain_text",
+        "text": "Back"
+    },
+    "action_id": "request_list"
+}
+
+update_request_list_worker_pending_unpaid_requests_button = {
+    "type": "button",
+    "text": {
+        "type": "plain_text",
+        "text": "Update"
+    },
+    "action_id": "request_list_worker_pending_unpaid_requests"
 }
 
 back_to_request_list_reviewer_menu = {
-    "color": "#008000",
-    "blocks": [
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Back"
-                    },
-                    "action_id": 'request_list_reviewer_menu'
-                }
-            ]
-        }
-    ]
+    "type": "button",
+    "text": {
+        "type": "plain_text",
+        "text": "Back"
+    },
+    "action_id": 'request_list_reviewer_menu'
+}
+
+update_request_list_reviewer_to_review_button = {
+    "type": "button",
+    "text": {
+        "type": "plain_text",
+        "text": "Update"
+    },
+    "action_id": 'request_list_reviewer_to_review'
 }
 
 back_to_request_list_reviewers_requests = {
-    "color": "#008000",
-    "blocks": [
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Back"
-                    },
-                    "action_id": 'request_list_reviewer_requests'
-                }
-            ]
-        }
-    ]
+    "type": "button",
+    "text": {
+        "type": "plain_text",
+        "text": "Back"
+    },
+    "action_id": 'request_list_reviewer_requests'
 }
 
 back_to_request_list_administrator_menu = {
-    "color": "#008000",
-    "blocks": [
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Back"
-                    },
-                    "action_id": 'request_list_administrator_menu'
-                }
-            ]
-        }
-    ]
+    "type": "button",
+    "text": {
+        "type": "plain_text",
+        "text": "Back"
+    },
+    "action_id": 'request_list_administrator_menu'
 }
 
 back_to_request_list_administrator_all_requests = {
+    "type": "button",
+    "text": {
+        "type": "plain_text",
+        "text": "Back"
+    },
+    "action_id": 'request_list_administrator_all_requests'
+}
+
+
+def update_request_list_administrator_all_requests_button(query_name):
+    action_id = 'request_list_administrator_all_requests_' + query_name
+    return {
+        "type": "button",
+        "text": {
+            "type": "plain_text",
+            "text": "Update"
+        },
+        "action_id": action_id
+    }
+
+
+request_list_buttons = {
     "color": "#008000",
     "blocks": [
         {
             "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Back"
-                    },
-                    "action_id": 'request_list_administrator_all_requests'
-                }
-            ]
+            "elements": []
         }
     ]
 }
@@ -574,22 +565,62 @@ def generate_request_block_list(request_list, user, action_id):
 
         attachments.append(request_item)
 
+    attachments.append(
+        {
+            "color": "#008000",
+            "blocks": [
+                {
+                    "type": "actions",
+                    "elements": []
+                }
+            ]
+        }
+    )
+
     if 'administrator' in user['roles']:
         if action_id.startswith('request_list_worker'):
-            attachments.append(back_to_request_list_reviewers_requests)
+            if action_id == 'request_list_worker_pending_unpaid_requests':
+                update_button = update_request_list_worker_pending_unpaid_requests_button
+                attachments[-1]['blocks'][0]['elements'].append(update_button)
+
+            attachments[-1]['blocks'][0]['elements'].append(back_to_request_list_reviewers_requests)
+
         elif action_id == 'request_list_reviewer_to_review':
-            attachments.append(back_to_request_list_administrator_menu)
+            update_button = update_request_list_reviewer_to_review_button
+            attachments[-1]['blocks'][0]['elements'].append(update_button)
+
+            attachments[-1]['blocks'][0]['elements'].append(back_to_request_list_administrator_menu)
+
         elif action_id.startswith('request_list_administrator_all_requests_'):
-            attachments.append(back_to_request_list_administrator_all_requests)
+            query_name = action_id.split('_')[5]
+            if query_name in ['pending', 'unpaid']:
+                update_button = update_request_list_administrator_all_requests_button(query_name)
+                attachments[-1]['blocks'][0]['elements'].append(update_button)
+
+            attachments[-1]['blocks'][0]['elements'].append(back_to_request_list_administrator_all_requests)
+
     elif 'reviewer' in user['roles']:
         if action_id.startswith('request_list_worker'):
-            attachments.append(back_to_request_list_reviewers_requests)
+            if action_id == 'request_list_worker_pending_unpaid_requests':
+                update_button = update_request_list_worker_pending_unpaid_requests_button
+                attachments[-1]['blocks'][0]['elements'].append(update_button)
+
+            attachments[-1]['blocks'][0]['elements'].append(back_to_request_list_reviewers_requests)
+
         elif action_id == 'request_list_reviewer_to_review':
-            attachments.append(back_to_request_list_reviewer_menu)
+            update_button = update_request_list_reviewer_to_review_button
+            attachments[-1]['blocks'][0]['elements'].append(update_button)
+
+            attachments[-1]['blocks'][0]['elements'].append(back_to_request_list_reviewer_menu)
     else:
         if action_id.startswith('request_list_worker'):
-            attachments.append(back_to_request_start_menu_button)
+            if action_id == 'request_list_worker_pending_unpaid_requests':
+                update_button = update_request_list_worker_pending_unpaid_requests_button
+                attachments[-1]['blocks'][0]['elements'].append(update_button)
 
+            attachments[-1]['blocks'][0]['elements'].append(back_to_request_start_menu_button)
+
+    print(attachments)
     return attachments
 
 
@@ -677,40 +708,50 @@ def request_created_successfully_reviewer(creator_name):
     ]
 
 
-def request_created_successfully():
-    return [
-        {
-            "type": "section",
-            "text": {
-                "type": "plain_text",
-                "text": "Request was created successfully"
+def request_created_successfully_modal(request_id):
+    return {
+        "title": {
+            "type": "plain_text",
+            "text": "Success"
+        },
+        "type": "modal",
+        "close": {
+            "type": "plain_text",
+            "text": "Close"
+        },
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": f'Request #{request_id} was created successfully.'
+                }
             }
-        }
-    ]
+        ]
+    }
 
 
-def request_not_created():
-    return [
-        {
-            "type": "section",
-            "text": {
-                "type": "plain_text",
-                "text": "Request wasn't created. Try again"
+def request_edited_successfully_modal(request_id):
+    return {
+        "title": {
+            "type": "plain_text",
+            "text": "Success"
+        },
+        "type": "modal",
+        "close": {
+            "type": "plain_text",
+            "text": "Close"
+        },
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": f'Request #{request_id} was edited successfully.'
+                }
             }
-        }
-    ]
-
-
-def request_edited_successfully():
-    return [
-        {
-            "type": "section",
-            "text": {
-                "type": "plain_text",
-                "text": "Request was edited successfully"
-            }
-        }
-    ]
+        ]
+    }
 
 
 def request_change_successfully(request_id):
@@ -725,40 +766,93 @@ def request_change_successfully(request_id):
     ]
 
 
-def request_error_edit():
+def request_status_changed_successfully(request_id, data):
+    if data['status'] == 'approved':
+        text = f'Congratulations, Your request #{request_id} was approved!'
+    else:
+        text = f'Unfortunately, Your request #{request_id} was denied.'
+
     return [
         {
             "type": "section",
             "text": {
                 "type": "plain_text",
-                "text": "Request wasn't edited successfully. Try again"
+                "text": text
             }
         }
     ]
 
 
-def request_deleted_successfully():
-    return [
+def request_status_changed_successfully_modal(request_id, data):
+    if data['status'] == 'approved':
+        text = f'Request #{request_id} was approved successfully.'
+    else:
+        text = f'Request #{request_id} was denied successfully.'
+    return {
+        "title": {
+            "type": "plain_text",
+            "text": "Success"
+        },
+        "type": "modal",
+        "close": {
+            "type": "plain_text",
+            "text": "Close"
+        },
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": text
+                }
+            }
+        ]
+    }
+
+
+request_error_modal = {
+    "title": {
+        "type": "plain_text",
+        "text": "Error"
+    },
+    "type": "modal",
+    "close": {
+        "type": "plain_text",
+        "text": "Close"
+    },
+    "blocks": [
         {
-            "type": "section",
+            "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": "Request was deleted successfully"
+                "text": "Oops, something went wrong, please, try again!"
             }
         }
     ]
+}
 
 
-def request_approved_successfully():
-    return [
-        {
-            "type": "section",
-            "text": {
-                "type": "plain_text",
-                "text": "Request was approved successfully"
+def request_deleted_successfully_modal(request_id):
+    return {
+        "title": {
+            "type": "plain_text",
+            "text": "Success"
+        },
+        "type": "modal",
+        "close": {
+            "type": "plain_text",
+            "text": "Close"
+        },
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": f'Request #{request_id} was deleted successfully.'
+                }
             }
-        }
-    ]
+        ]
+    }
 
 
 def request_create_modal(user):

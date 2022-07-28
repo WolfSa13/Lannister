@@ -20,7 +20,7 @@ def lambda_handler(event, context):
     elif action_id == "worker_start_menu":
         data = {
             "response_type": 'in_channel',
-            "replace_original": False,
+            "replace_original": True,
             "blocks": user_start_menu
         }
 
@@ -40,7 +40,7 @@ def lambda_handler(event, context):
 
         data = {
             "response_type": 'in_channel',
-            "replace_original": False,
+            "replace_original": True,
             "attachments": attachments
 
         }
@@ -84,6 +84,7 @@ def lambda_handler(event, context):
 
         selected_options = event['body']['view']['state']['values'][roles_block_id]['worker_roles_input'][
             'selected_options']
+
         for option in selected_options:
             roles.append(int(option['value']))
 
@@ -98,18 +99,30 @@ def lambda_handler(event, context):
         }
 
         users_created = UsersQuery.add_new_user(new_user_data)
-        blocks = [error_message]
+
+        new_roles = []
+
+        for role in roles:
+            if role == 1:
+                new_roles.append('worker')
+            elif role == 2:
+                new_roles.append('reviewer')
+            elif role == 3:
+                new_roles.append('administrator')
+
+        new_user_data['roles'] = new_roles
+
+        view = worker_error_modal()
 
         if users_created:
-            blocks = [user_created_successfully(full_name)]
+            view = worker_created_successfully_modal(new_user_data)
 
         data = {
-            "token": SLACK_BOT_TOKEN,
-            'channel': event['body']['user']['id'],
-            "blocks": blocks
+            "trigger_id": event['body']['trigger_id'],
+            "view": view
         }
 
-        response_url = 'https://slack.com/api/chat.postMessage'
+        response_url = 'https://slack.com/api/views.open'
 
         headers = {
             'Content-type': 'application/json',
@@ -198,18 +211,19 @@ def lambda_handler(event, context):
         }
 
         users_updated = UsersQuery.update_user(user_id, data)
-        blocks = [error_message]
+        user = UsersQuery.get_user_by_id(user_id)
+
+        view = worker_error_modal()
 
         if users_updated:
-            blocks = [user_edited_successfully]
+            view = worker_edited_successfully_modal(user)
 
         data = {
-            "token": SLACK_BOT_TOKEN,
-            'channel': event['body']['user']['id'],
-            "blocks": blocks
+            "trigger_id": event['body']['trigger_id'],
+            "view": view
         }
 
-        response_url = 'https://slack.com/api/chat.postMessage'
+        response_url = 'https://slack.com/api/views.open'
 
         headers = {
             'Content-type': 'application/json',
@@ -223,17 +237,18 @@ def lambda_handler(event, context):
 
         user_deleted = UsersQuery.delete_user(user_id)
 
-        blocks = [error_message]
+        view = worker_error_modal()
+
         if user_deleted:
-            blocks = [user_deleted_successfully]
+            view = worker_deleted_successfully_modal
 
         data = {
-            'token': SLACK_BOT_TOKEN,
-            'channel': event['user']['id'],
-            "blocks": blocks
+            "trigger_id": event['trigger_id'],
+            "view": view
         }
 
-        response_url = 'https://slack.com/api/chat.postMessage'
+        response_url = 'https://slack.com/api/views.open'
+
         headers = {
             'Content-type': 'application/json',
             "Authorization": "Bearer " + SLACK_BOT_TOKEN

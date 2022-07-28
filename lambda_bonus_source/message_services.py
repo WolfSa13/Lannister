@@ -65,13 +65,122 @@ bonus_edited_successfully = {
 }
 
 
-def bonus_created_successfully(name):
+def bonus_created_successfully_modal(data):
     return {
-        "type": "section",
-        "text": {
+        "title": {
             "type": "plain_text",
-            "text": f"Bonus {name} was created successfully"
+            "text": "Success"
+        },
+        "type": "modal",
+        "close": {
+            "type": "plain_text",
+            "text": "Close"
+        },
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Bonus was created successfully!"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*Bonus type:* {data['type']}"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*Bonus description:* {data['description']}"
+                }
+            }
+        ]
+    }
+
+
+def bonus_edited_successfully_modal(data):
+    return {
+        "title": {
+            "type": "plain_text",
+            "text": "Success"
+        },
+        "type": "modal",
+        "close": {
+            "type": "plain_text",
+            "text": "Close"
+        },
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Bonus was edited successfully!"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*Bonus type:* {data['type']}"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*Bonus description:* {data['description']}"
+                }
+            }
+        ]
+    }
+
+
+bonus_deleted_successfully_modal = {
+    "title": {
+        "type": "plain_text",
+        "text": "Success"
+    },
+    "type": "modal",
+    "close": {
+        "type": "plain_text",
+        "text": "Close"
+    },
+    "blocks": [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "Bonus was deleted successfully!"
+            }
         }
+    ]
+}
+
+
+def bonus_error_modal():
+    return {
+        "title": {
+            "type": "plain_text",
+            "text": "Error"
+        },
+        "type": "modal",
+        "close": {
+            "type": "plain_text",
+            "text": "Close"
+        },
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Oops, something went wrong, please, try again!"
+                }
+            }
+        ]
     }
 
 
@@ -147,6 +256,14 @@ back_to_bonus_start_menu_button = {
         {
             "type": "actions",
             "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Update"
+                    },
+                    "action_id": "bonus_list"
+                },
                 {
                     "type": "button",
                     "text": {
