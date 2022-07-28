@@ -44,6 +44,27 @@ def lambda_handler(event, context):
 
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
+    elif action_id == 'request_payment_day':
+        payment_date = RequestQuery.get_requests_by_payment_date()
+
+        response_url = 'https://slack.com/api/chat.postMessage'
+
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + SLACK_BOT_TOKEN
+        }
+
+        for key, value in payment_date.items():
+            attachments = generate_notification_payment_day(value)
+
+            data = {
+                "token": SLACK_BOT_TOKEN,
+                "channel": key,
+                "attachments": attachments
+            }
+
+        requests.post(response_url, data=json.dumps(data), headers=headers)
+
     elif action_id.startswith('request_list'):
         user = UsersQuery.get_user_by_slack_id(event['user']['id'])
 

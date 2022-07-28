@@ -85,4 +85,13 @@ def lambda_handler(event, context):
 
         invoke_lambda(function_name, data)
 
+    elif 'type' in event and event['type'] == 'check_payment':
+        function_name = resolve_function_name('request')
+
+        data = {
+            "action_id": event['action_id']
+        }
+
+        invoke_lambda(function_name, data)
+
     return STATUS_CODE_200
