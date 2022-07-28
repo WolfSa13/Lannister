@@ -245,39 +245,150 @@ def worker_edit_modal(user):
     }
 
 
-error_message = {
-    "type": "section",
-    "text": {
-        "type": "plain_text",
-        "text": "Operation is unsuccessful. Try again."
-    }
-}
-
-
-def user_created_successfully(full_name):
+def worker_error_modal():
     return {
-        "type": "section",
-        "text": {
+        "title": {
             "type": "plain_text",
-            "text": f"User {full_name} was created successfuly."
+            "text": "Error"
+        },
+        "type": "modal",
+        "close": {
+            "type": "plain_text",
+            "text": "Close"
+        },
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Oops, something went wrong, please, try again!"
+                }
+            }
+        ]
+    }
+
+
+def worker_created_successfully_modal(data):
+    return {
+        "title": {
+            "type": "plain_text",
+            "text": "Success"
+        },
+        "type": "modal",
+        "close": {
+            "type": "plain_text",
+            "text": "Close"
+        },
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "User was created successfully!"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*User full name:* {data['full_name']}"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*User position:* {data['position']}"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*User roles:* {data['roles']}"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*User slack_id:* {data['slack_id']}"
+                }
+            }
+        ]
+    }
+
+
+def worker_edited_successfully_modal(data):
+    return {
+        "title": {
+            "type": "plain_text",
+            "text": "Success"
+        },
+        "type": "modal",
+        "close": {
+            "type": "plain_text",
+            "text": "Close"
+        },
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "User was edited successfully!"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*User full name:* {data['full_name']}"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*User position:* {data['position']}"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*User roles:* {data['roles']}"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*User slack_id:* {data['slack_id']}"
+                }
+            }
+        ]
+    }
+
+
+worker_deleted_successfully_modal = {
+    "title": {
+        "type": "plain_text",
+        "text": "Success"
+    },
+    "type": "modal",
+    "close": {
+        "type": "plain_text",
+        "text": "Close"
+    },
+    "blocks": [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "Bonus was deleted successfully!"
+            }
         }
-    }
-
-
-user_edited_successfully = {
-    "type": "section",
-    "text": {
-        "type": "plain_text",
-        "text": "User was edited successfully"
-    }
-}
-
-user_deleted_successfully = {
-    "type": "section",
-    "text": {
-        "type": "plain_text",
-        "text": "User was deleted successfully"
-    }
+    ]
 }
 
 user_start_menu = [
@@ -329,6 +440,14 @@ back_to_user_start_menu_button = {
             "type": "actions",
             "elements": [
                 {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Update"
+                    },
+                    "action_id": "worker_list"
+                },
+{
                     "type": "button",
                     "text": {
                         "type": "plain_text",
