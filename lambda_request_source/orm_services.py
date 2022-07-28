@@ -90,7 +90,7 @@ class RequestQuery:
         return create_request_id
 
     @staticmethod
-    def get_filtered_requests(status=None, reviewer_id=None, creator_id=None, payment_date=None):
+    def get_filtered_requests(status, reviewer_id):
         with Session(engine) as session:
             creator = db.orm.aliased(Users)
             reviewer = db.orm.aliased(Users)
@@ -99,14 +99,9 @@ class RequestQuery:
                                   ColElem.label(creator.c.slack_id, 'creator_slack_id'),
                                   ColElem.label(reviewer.c.full_name, 'reviewer_name'),
                                   ColElem.label(reviewer.c.slack_id, 'reviewer_slack_id')).order_by(Requests.columns.id)
-            if status is not None:
-                query = query.filter(Requests.columns.id == status)
-            elif reviewer_id is not None:
-                query = query.filter(Requests.columns.reviewer == reviewer_id)
-            elif creator_id is not None:
-                query = query.filter(Requests.columns.creator == creator_id)
-            elif payment_date is not None:
-                query = query.filter(Requests.columns.payment_date == payment_date)
+
+            query = query.filter(Requests.columns.status == status)
+            query = query.filter(Requests.columns.reviewer == reviewer_id)
 
             query_result = query.join(TypeBonuses, Requests.c.type_bonus == TypeBonuses.c.id) \
                 .join(creator, Requests.c.creator == creator.c.id) \

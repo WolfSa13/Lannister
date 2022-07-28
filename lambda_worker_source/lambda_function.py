@@ -84,6 +84,7 @@ def lambda_handler(event, context):
 
         selected_options = event['body']['view']['state']['values'][roles_block_id]['worker_roles_input'][
             'selected_options']
+
         for option in selected_options:
             roles.append(int(option['value']))
 
@@ -101,7 +102,7 @@ def lambda_handler(event, context):
 
         new_roles = []
 
-        for role in 'roles':
+        for role in roles:
             if role == 1:
                 new_roles.append('worker')
             elif role == 2:
@@ -210,23 +211,12 @@ def lambda_handler(event, context):
         }
 
         users_updated = UsersQuery.update_user(user_id, data)
-
-        new_roles = []
-
-        for role in 'roles':
-            if role == 1:
-                new_roles.append('worker')
-            elif role == 2:
-                new_roles.append('reviewer')
-            elif role == 3:
-                new_roles.append('administrator')
-
-        data['roles'] = new_roles
+        user = UsersQuery.get_user_by_id(user_id)
 
         view = worker_error_modal()
 
         if users_updated:
-            view = worker_edited_successfully_modal(data)
+            view = worker_edited_successfully_modal(user)
 
         data = {
             "trigger_id": event['body']['trigger_id'],

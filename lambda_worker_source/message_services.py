@@ -268,7 +268,8 @@ def worker_error_modal():
     }
 
 
-def worker_created_successfully_modal(data):
+def worker_created_successfully_modal(user):
+
     return {
         "title": {
             "type": "plain_text",
@@ -291,35 +292,35 @@ def worker_created_successfully_modal(data):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*User full name:* {data['full_name']}"
+                    "text": f"*User full name:* {user['full_name']}"
                 }
             },
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*User position:* {data['position']}"
+                    "text": f"*User position:* {user['position']}"
                 }
             },
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*User roles:* {data['roles']}"
+                    "text": f"*Roles:* {', '.join(user['roles'])}"
                 }
             },
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*User slack_id:* {data['slack_id']}"
+                    "text": f"*User slack_id:* {user['slack_id']}"
                 }
             }
         ]
     }
 
 
-def worker_edited_successfully_modal(data):
+def worker_edited_successfully_modal(user):
     return {
         "title": {
             "type": "plain_text",
@@ -342,28 +343,28 @@ def worker_edited_successfully_modal(data):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*User full name:* {data['full_name']}"
+                    "text": f"*User full name:* {user['full_name']}"
                 }
             },
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*User position:* {data['position']}"
+                    "text": f"*User position:* {user['position']}"
                 }
             },
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*User roles:* {data['roles']}"
+                    "text": f"*Roles:* {', '.join(user['roles'])}"
                 }
             },
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*User slack_id:* {data['slack_id']}"
+                    "text": f"*User slack_id:* {user['slack_id']}"
                 }
             }
         ]
