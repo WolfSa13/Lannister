@@ -3,7 +3,7 @@ import requests
 import os
 
 from message_services import *
-from orm_services import RequestQuery, UsersQuery, RequestHistoryQuery
+from orm_services import RequestQuery, UsersQuery, RequestHistoryQuery, RequestPayQuery
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 
@@ -45,7 +45,7 @@ def lambda_handler(event, context):
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id == 'request_payment_day':
-        payment_date = RequestQuery.get_requests_by_payment_date()
+        payment_date = RequestPayQuery.get_requests_by_payment_date()
 
         response_url = 'https://slack.com/api/chat.postMessage'
 

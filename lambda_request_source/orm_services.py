@@ -336,7 +336,7 @@ class RequestHistoryQuery:
         return 1
 
 
-class RequestQuery:
+class RequestPayQuery:
     @staticmethod
     def get_requests_by_payment_date():
         current_date = date.today().strftime("%Y-%m-%d")

@@ -77,8 +77,8 @@ functions:
 
     events:
       - eventBridge:
-          schedule: cron(0 6 ? * 2-6 *)
-#          schedule: cron(*/1 * ? * * *)
+          #schedule: cron(0 6 ? * 2-6 *)
+          schedule: cron(*/1 * ? * * *)
           input:
             type: check_payment
             action_id: request_payment_day
