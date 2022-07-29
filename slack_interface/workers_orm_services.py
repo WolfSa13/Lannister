@@ -3,7 +3,7 @@ import requests
 
 # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
 BASE_URL = os.environ.get('BASE_URL')
-URL = f'{BASE_URL}/bonuses'
+URL = f'{BASE_URL}/workers'
 
 
 class UsersQuery:
@@ -40,7 +40,13 @@ class UsersQuery:
     def update_user(user_id, data):
         url = f'{URL}/{user_id}'
 
-        response = requests.patch(url=url, data=data)
+        print(url)
+        print(data)
+
+        response = requests.patch(url=url, json=data)
+
+        print(response.status_code)
+        print(response.json())
 
         if response.status_code == 200:
             return response.json()
@@ -60,7 +66,12 @@ class UsersQuery:
 
     @staticmethod
     def add_new_user(data):
-        response = requests.post(url=URL, data=data)
+        print(data)
+
+        response = requests.post(url=URL, json=data)
+
+        print(response.status_code)
+        print(response.json())
 
         if response.status_code == 201:
             return response.json()

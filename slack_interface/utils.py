@@ -38,23 +38,23 @@ def func_to_invoke(function_name):
         function_to_invoke = requests_function
 
     else:
-        function_to_invoke = bonuses_function()
+        function_to_invoke = bonuses_function
 
     return function_to_invoke
 
 
-def datetime_converter(date_time):
-    date_time_obj = datetime.strptime(str(date_time), '%Y-%m-%d %H:%M:%S.%f%z')
-    converted_date_time = date_time_obj.strftime("%H:%M %d/%b/%y")
-
-    return converted_date_time
-
-
-def date_converter(date):
-    date_obj = datetime.strptime(str(date), '%Y-%m-%d')
-    converted_date = date_obj.strftime("%d/%b/%y")
-
-    return converted_date
+# def datetime_converter(date_time):
+#     date_time_obj = datetime.strptime(str(date_time), '%Y-%m-%d %H:%M:%S.%f%z')
+#     converted_date_time = date_time_obj.strftime("%H:%M %d/%b/%y")
+#
+#     return converted_date_time
+#
+#
+# def date_converter(date):
+#     date_obj = datetime.strptime(str(date), '%Y-%m-%d')
+#     converted_date = date_obj.strftime("%d/%b/%y")
+#
+#     return converted_date
 
 
 def logger(data):

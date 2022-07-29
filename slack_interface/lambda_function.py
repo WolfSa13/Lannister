@@ -12,8 +12,10 @@ STATUS_CODE_200 = {
 
 
 def lambda_handler(event, context):
+    print(event)
     body = event['body']
     isBase64Encoded = event['isBase64Encoded']
+    print(body)
 
     # check if event body was decoded
     if isBase64Encoded:

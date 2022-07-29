@@ -54,6 +54,8 @@ def requests_function(event):
             "replace_original": True
         }
 
+        print(user)
+
         if action_id == 'request_list':
             if 'administrator' in user['roles']:
                 blocks = request_list_administrator_menu
@@ -63,7 +65,6 @@ def requests_function(event):
                 blocks = worker_request_list_menu
 
             data["blocks"] = blocks
-
         elif action_id.startswith('request_list_worker'):
             if action_id == 'request_list_worker_pending_unpaid_requests':
                 request_list = RequestQuery.get_worker_pending_unpaid_requests(user['id'])

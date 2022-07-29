@@ -2,19 +2,21 @@ import requests
 from utils import *
 
 
+
 def get_main_menu_blocks(user_slack_id):
     workers_action_id = 'worker_start_menu'
     requests_action_id = 'request_start_menu'
     bonuses_action_id = 'bonus_start_menu'
 
-    function_name = resolve_function_name('worker')
+    function = func_to_invoke('worker')
 
     data = {
         "user_slack_id": user_slack_id,
         "action_id": 'worker_get'
     }
 
-    response = json.load(invoke_request_response_lambda(function_name, data)['Payload'])
+    response = function(data)
+    print(response)
     user_roles = response['roles']
 
     start_menu = [

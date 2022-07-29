@@ -1,4 +1,4 @@
-service: mvp
+service: rest
 useDotenv: true
 
 provider:
@@ -21,10 +21,10 @@ functions:
     environment:
         SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
         BASE_URL: ${env:BASE_URL}
-    events:
-      - eventBridge:
-          #schedule: cron(0 6 ? * 2-6 *)
-          schedule: cron(*/1 * ? * * *)
-          input:
-            type: check_payment
-            action_id: request_payment_day
+#    events:
+#      - eventBridge:
+#          #schedule: cron(0 6 ? * 2-6 *)
+#          schedule: cron(*/1 * ? * * *)
+#          input:
+#            type: check_payment
+#            action_id: request_payment_day

@@ -25,7 +25,7 @@ class RequestQuery:
     def update_request(request_id, data):
         url = f'{URL}/{request_id}'
 
-        response = requests.patch(url=url, data=data)
+        response = requests.patch(url=url, json=data)
 
         if response.status_code == 200:
             return response.json()
@@ -45,7 +45,7 @@ class RequestQuery:
 
     @staticmethod
     def add_new_request(data):
-        response = requests.post(url=URL, data=data)
+        response = requests.post(url=URL, json=data)
 
         if response.status_code == 201:
             return response.json()
@@ -144,7 +144,7 @@ class RequestHistoryQuery:
 
         url = f'{URL}/{request_id}/history'
 
-        response = requests.post(url=url, data=new_history)
+        response = requests.post(url=url, json=new_history)
 
         if response.status_code == 201:
             return response.json()

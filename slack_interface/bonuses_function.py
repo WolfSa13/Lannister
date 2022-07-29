@@ -66,7 +66,7 @@ def bonuses_function(event):
     elif action_id.startswith('bonus_edit'):
         bonus_id = int(action_id.split('_')[2])
 
-        bonus = TypeBonusesQuery.get_bonuses(bonus_id)[0]
+        bonus = TypeBonusesQuery.get_bonuses(bonus_id)
 
         if bonus:
             data = {

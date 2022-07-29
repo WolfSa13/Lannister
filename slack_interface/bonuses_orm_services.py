@@ -25,7 +25,7 @@ class TypeBonusesQuery:
     def update_bonuses(bonus_id, data):
         url = f'{URL}/{bonus_id}'
 
-        response = requests.patch(url=url, data=data)
+        response = requests.patch(url=url, json=data)
 
         if response.status_code == 200:
             return response.json()
@@ -45,7 +45,7 @@ class TypeBonusesQuery:
 
     @staticmethod
     def add_new_bonus(data):
-        response = requests.post(url=URL, data=data)
+        response = requests.post(url=URL, json=data)
 
         if response.status_code == 201:
             return response.json()
