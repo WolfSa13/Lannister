@@ -27,6 +27,12 @@ UsersRolesRelation = metadata.tables['users_roles_relation']
 
 
 class RequestQuery:
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_requests(request_id=None):
         with Session(engine) as session:
@@ -46,6 +52,12 @@ class RequestQuery:
 
         return query_result
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests/{request_id}'
+    #
+    # response = requests.patch(url=url, data=data) (data оця з агрументів)
     @staticmethod
     def update_request(request_id, data):
         with Session(engine) as session:
@@ -59,6 +71,12 @@ class RequestQuery:
 
         return 1
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests/{request_id}'
+    #
+    # response = requests.delete(url=url)
     @staticmethod
     def delete_request(request_id):
         with Session(engine) as session:
@@ -73,6 +91,12 @@ class RequestQuery:
 
         return query_result
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests'
+    #
+    # response = requests.post(url=url, data=data) (data оця з агрументів)
     @staticmethod
     def add_new_request(data):
         with Session(engine) as session:
@@ -89,6 +113,12 @@ class RequestQuery:
 
         return create_request_id
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests?type=1&status={status}&reviewer_id={reviewer_id}'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_filtered_requests(status, reviewer_id):
         with Session(engine) as session:
@@ -109,6 +139,12 @@ class RequestQuery:
 
         return query_result
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests?type=2&creator_id={creator_id}'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_worker_pending_unpaid_requests(creator_id):
         with Session(engine) as session:
@@ -134,6 +170,12 @@ class RequestQuery:
 
             return query_result
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests?type=3&creator_id={creator_id}'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_worker_approved_denied_requests(creator_id):
         with Session(engine) as session:
@@ -159,6 +201,12 @@ class RequestQuery:
 
             return query_result
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests?type=4&creator_id={creator_id}'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_worker_deleted_requests(creator_id):
         with Session(engine) as session:
@@ -179,6 +227,12 @@ class RequestQuery:
 
             return query_result
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests?type=5&query_name={query_name}'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_administrator_all_requests(query_name):
         with Session(engine) as session:
@@ -245,6 +299,12 @@ class UsersQuery:
         user = UsersQuery.get_users(slack_id=slack_id)[0]
         return user
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/workers?role=reviewer'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_reviewers():
         with Session(engine) as session:
@@ -277,6 +337,7 @@ class UsersQuery:
 
 
 class TypeBonusesQuery:
+    # ці вже є в папці бонусів
     @staticmethod
     def get_bonuses(bonus_id=None):
         with Session(engine) as session:
@@ -299,6 +360,12 @@ class TypeBonusesQuery:
 
 
 class RequestHistoryQuery:
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests/{request_id}/history'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_request_history(request_id):
         with Session(engine) as session:
@@ -308,6 +375,13 @@ class RequestHistoryQuery:
 
         return query_result
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests/{request_id}/history'
+    #
+    # response = requests.post(url=url)
+    # але тут вже зі мною треба фіксати
     @staticmethod
     def add_history(data, request_id, editor, old_request=None):
         with Session(engine) as session:

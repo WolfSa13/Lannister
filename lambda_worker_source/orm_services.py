@@ -14,6 +14,12 @@ engine = db.create_engine(
 print('worker engine creation')
 
 class UsersQuery:
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/workers'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_users(user_id=None, slack_id=None):
         with Session(engine) as session:
@@ -49,18 +55,36 @@ class UsersQuery:
 
         return list(parsed_result.values())
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/workers/{user_id}'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_user_by_id(user_id):
         user = UsersQuery.get_users(user_id=user_id)[0]
 
         return user
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/workers?slack_id={slack_id}'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_user_by_slack_id(slack_id):
         user = UsersQuery.get_users(slack_id=slack_id)[0]
 
         return user
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/workers/{user_id}'
+    #
+    # response = requests.patch(url=url, data=data) (data з аргумент функції)
     @staticmethod
     def update_user(user_id, data):
         with Session(engine) as session:
@@ -85,6 +109,12 @@ class UsersQuery:
             session.commit()
         return query_result
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/workers/{user_id}'
+    #
+    # response = requests.delete(url=url)
     @staticmethod
     def delete_user(user_id):
         with Session(engine) as session:
@@ -98,6 +128,12 @@ class UsersQuery:
                 return 0
         return query_result
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/workers'
+    #
+    # response = requests.post(url=url, data=data) (data з аргумент функції)
     @staticmethod
     def add_new_user(data):
         with Session(engine) as session:

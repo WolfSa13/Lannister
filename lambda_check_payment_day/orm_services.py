@@ -19,6 +19,12 @@ db.MetaData.reflect(metadata)
 
 
 class RequestQuery:
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/requests?type=6'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_requests_by_payment_date():
         current_date = date.today().strftime("%Y-%m-%d")

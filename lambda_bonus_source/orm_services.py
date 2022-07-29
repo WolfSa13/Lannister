@@ -20,7 +20,12 @@ UsersRolesRelation = metadata.tables['users_roles_relation']
 
 
 class TypeBonusesQuery:
-
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/bonuses'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_bonuses(bonus_id=None):
         with Session(engine) as session:
@@ -33,6 +38,12 @@ class TypeBonusesQuery:
 
         return query_result
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/bonuses/{bonus_id}'
+    #
+    # response = requests.patch(url=url, data=data) (data це оця що приходить в метод параметром)
     @staticmethod
     def update_bonuses(bonus_id, data):
         with Session(engine) as session:
@@ -48,6 +59,12 @@ class TypeBonusesQuery:
 
         return 1
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/bonuses/{bonus_id}'
+    #
+    # response = requests.delete(url=url)
     @staticmethod
     def delete_bonuses(bonus_id):
         with Session(engine) as session:
@@ -63,6 +80,12 @@ class TypeBonusesQuery:
 
         return 1
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/bonuses/{bonus_id}'
+    #
+    # response = requests.post(url=url, data=data) (data це оця що приходить в метод параметром)
     @staticmethod
     def add_new_bonus(data):
         with Session(engine) as session:
@@ -78,6 +101,12 @@ class TypeBonusesQuery:
 
 
 class UsersQuery:
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/workers'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_users(user_id=None, slack_id=None):
         with Session(engine) as session:
@@ -96,6 +125,12 @@ class UsersQuery:
 
         return UsersQuery._parse_users_data(query_result)
 
+    # import requests
+    #
+    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+    # url = f'{BASE_URL}/workers?slack_id={slack_id}'
+    #
+    # response = requests.get(url=url)
     @staticmethod
     def get_user_by_slack_id(slack_id):
         user = UsersQuery.get_users(slack_id=slack_id)[0]
