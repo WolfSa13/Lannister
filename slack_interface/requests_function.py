@@ -54,8 +54,6 @@ def requests_function(event):
             "replace_original": True
         }
 
-        print(user)
-
         if action_id == 'request_list':
             if 'administrator' in user['roles']:
                 blocks = request_list_administrator_menu
@@ -172,7 +170,6 @@ def requests_function(event):
         request_id = int(action_id.split('_')[2])
 
         request_history_list = RequestHistoryQuery.get_request_history(request_id=request_id)
-        print(request_history_list)
         attachments = generate_request_history_block_list(request_history_list)
 
         data = {
@@ -196,6 +193,7 @@ def requests_function(event):
         editor_slack_id = event['user']['id']
         editor = UsersQuery.get_user_by_slack_id(editor_slack_id)
 
+
         response_url_message = 'https://slack.com/api/chat.postMessage'
         response_url_modal = 'https://slack.com/api/views.open'
 
@@ -213,12 +211,12 @@ def requests_function(event):
             'status': status
         }
 
+        old_request = RequestQuery.get_requests(request_id=request_id)[0]
         request_updated = RequestQuery.update_request(request_id, data)
 
         view = request_error_modal
 
         if request_updated:
-            old_request = RequestQuery.get_requests(request_id=request_id)[0]
             RequestHistoryQuery.add_history(data, request_id=request_id, editor=editor['full_name'],
                                             old_request=old_request)
             request = RequestQuery.get_requests(request_id)[0]
@@ -248,12 +246,19 @@ def requests_function(event):
             requests.post(response_url_modal, data=json.dumps(data_error_message), headers=headers)
 
     elif action_id.startswith('request_delete_'):
-
         request_id = int(action_id.split('_')[2])
 
-        request_deleted = RequestQuery.delete_request(request_id)
+        editor_slack_id = event['user']['id']
+        creator = UsersQuery.get_user_by_slack_id(editor_slack_id)
 
         view = request_error_modal
+
+        old_request = RequestQuery.get_requests(request_id=request_id)[0]
+        request_deleted = RequestQuery.delete_request(request_id)
+
+        if request_deleted:
+            RequestHistoryQuery.add_history({'status': 'deleted'}, request_id=request_id, editor=creator['full_name'],
+                                            old_request=old_request)
 
         if request_deleted:
             view = request_deleted_successfully_modal(request_id)
@@ -418,7 +423,7 @@ def requests_function(event):
 
         view = request_error_modal
 
-        if updated_request is not None:
+        if updated_request:
             data['reviewer_name'] = reviewer_name.replace('+', ' ')
             data['bonus_name'] = bonus_type_name.replace('+', ' ')
             RequestHistoryQuery.add_history(data, request_id=updated_request['id'], editor=creator['full_name'],

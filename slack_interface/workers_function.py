@@ -175,11 +175,8 @@ def workers_function(event):
             "Authorization": "Bearer " + SLACK_BOT_TOKEN
         }
 
-        print(data)
         res = requests.post(response_url, data=json.dumps(data), headers=headers)
-        print(res.status_code)
-        print(res.json())
-        print('--------------------')
+
 
     elif action_id.startswith("worker_modal_edit"):
 
@@ -217,9 +214,6 @@ def workers_function(event):
 
         view = worker_error_modal()
 
-        print('--------------------')
-        print(event)
-        print(users_updated)
 
         if users_updated:
             view = worker_edited_successfully_modal(user)
@@ -228,8 +222,6 @@ def workers_function(event):
             "trigger_id": event['body']['trigger_id'],
             "view": view
         }
-
-        print(view_data)
 
         response_url = RESPONSE_URL
 
@@ -240,9 +232,7 @@ def workers_function(event):
 
         # res = requests.post(response_url, data=json.dumps(view_data), headers=headers)
         res = requests.post(response_url, json=view_data, headers=headers)
-        print(res.status_code)
-        print(res.json())
-        print('--------------------')
+
 
     elif action_id.startswith("worker_delete_"):
         user_id = int(action_id.split('_')[2])

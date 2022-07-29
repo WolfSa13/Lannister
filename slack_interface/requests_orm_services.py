@@ -122,10 +122,11 @@ class RequestHistoryQuery:
 
     @staticmethod
     def add_history(data, request_id, editor, old_request=None):
-        if old_request is not None:
-            request = dict(old_request)
-        else:
+
+        if old_request is None:
             request = dict()
+        else:
+            request = old_request
 
         changes_log = ''
         for key in data.keys():
