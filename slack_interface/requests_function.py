@@ -172,7 +172,7 @@ def requests_function(event):
         request_id = int(action_id.split('_')[2])
 
         request_history_list = RequestHistoryQuery.get_request_history(request_id=request_id)
-
+        print(request_history_list)
         attachments = generate_request_history_block_list(request_history_list)
 
         data = {

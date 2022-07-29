@@ -675,7 +675,7 @@ back_to_request_list_button = {
 
 
 def generate_request_history_block_list(request_history_list):
-    attachments = [request_history_string(request_history_list[0].request_id)]
+    attachments = [request_history_string(request_history_list[0]['request_id'])]
 
     for request_history_event in request_history_list:
         request_history_item = {
@@ -686,11 +686,11 @@ def generate_request_history_block_list(request_history_list):
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"*Editor:* {request_history_event.editor}"
+                            "text": f"*Editor:* {request_history_event['editor']}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*When:* {datetime_converter(request_history_event.timestamp)}"
+                            "text": f"*When:* {datetime_converter(request_history_event['timestamp'])}"
                         }
                     ]
                 },
@@ -698,7 +698,7 @@ def generate_request_history_block_list(request_history_list):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"*Changes:*\n{request_history_event.changes}"
+                        "text": f"*Changes:*\n{request_history_event['changes']}"
                     }
                 }
             ]
