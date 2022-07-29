@@ -132,8 +132,6 @@ def workers_function(event):
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id == 'worker_team_join':
-        print('worker_team_join')
-        print(event)
         new_user_data = {
             'full_name': event['user']['real_name'],
             'roles': [1],
@@ -163,7 +161,7 @@ def workers_function(event):
     # modal window for edit user profile
     elif action_id.startswith("worker_edit"):
         user_id = int(action_id.split('_')[2])
-        user = UsersQuery.get_users(user_id)[0]
+        user = UsersQuery.get_user_by_id(user_id)
 
         if user:
             data = {
