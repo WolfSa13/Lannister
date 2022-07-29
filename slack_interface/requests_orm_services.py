@@ -36,7 +36,7 @@ class RequestQuery:
     def delete_request(request_id):
         url = f'{URL}/{request_id}'
 
-        response = requests.patch(url=url)
+        response = requests.delete(url=url)
 
         if response.status_code == 204:
             return 1

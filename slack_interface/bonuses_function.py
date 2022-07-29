@@ -10,15 +10,6 @@ SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 
 
 def bonuses_function(event):
-    """
-    example_event = {
-        'response_url': 'url',
-        "trigger_id": body['trigger_id'],
-        'action_id': action_id,
-        'user': body['user']
-    }
-    """
-
     action_id = event['action_id']
 
     if action_id.startswith('bonus_list'):
