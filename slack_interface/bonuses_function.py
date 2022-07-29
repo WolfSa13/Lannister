@@ -3,7 +3,8 @@ import requests
 import os
 
 from bonuses_message_services import *
-from bonuses_orm_services import TypeBonusesQuery, UsersQuery
+from bonuses_orm_services import TypeBonusesQuery
+from workers_orm_services import UsersQuery
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 

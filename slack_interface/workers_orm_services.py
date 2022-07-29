@@ -1,17 +1,10 @@
-import sqlalchemy as db
-from sqlalchemy.orm.session import Session
-from models import User, UsersRolesRelation, Roles
 import os
+import requests
 
-POSTGRES_USER = os.environ.get('POSTGRES_USER')
-POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
-POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
-POSTGRES_PORT = os.environ.get('POSTGRES_PORT')
-POSTGRES_DB = os.environ.get('POSTGRES_DB')
+# BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+BASE_URL = os.environ.get('BASE_URL')
+URL = f'{BASE_URL}/bonuses'
 
-engine = db.create_engine(
-    f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}')
-print('worker engine creation')
 
 class UsersQuery:
     # import requests
@@ -67,17 +60,16 @@ class UsersQuery:
 
         return user
 
-    # import requests
-    #
-    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
-    # url = f'{BASE_URL}/workers?slack_id={slack_id}'
-    #
-    # response = requests.get(url=url)
     @staticmethod
     def get_user_by_slack_id(slack_id):
-        user = UsersQuery.get_users(slack_id=slack_id)[0]
+        url = f'{URL}?slack_id={slack_id}'
 
-        return user
+        response = requests.get(url=url)
+
+        if response.status_code == 200:
+            return response.json()
+
+        return None
 
     # import requests
     #

@@ -1,4 +1,3 @@
-import datetime
 import requests
 import os
 
@@ -97,12 +96,6 @@ class RequestQuery:
 
         return None
 
-    # import requests
-    #
-    # BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
-    # url = f'{BASE_URL}/requests?type=5&query_name={query_name}'
-    #
-    # response = requests.get(url=url)
     @staticmethod
     def get_administrator_all_requests(query_name):
         url = f'{URL}?type=5&query_name={query_name}'
