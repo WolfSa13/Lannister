@@ -1,7 +1,7 @@
 import json
 
-from utils import base64_encoder, resolve_function_name, invoke_lambda
-from message_services import respond_with_error_return_menu, respond_with_menu
+from utils import base64_encoder, func_to_invoke
+from slack_interface_message_services import respond_with_error_return_menu, respond_with_menu
 
 STATUS_CODE_200 = {
     "isBase64Encoded": True,
@@ -20,22 +20,20 @@ def lambda_handler(event, context):
         body = base64_encoder(body)
     else:
         body = json.loads(body)
-    print('Body')
-    print(body)
 
     # when the command was called in the chat
     if 'challenge' in body:
         return body
 
     if 'event' in body and body['event']['type'] == 'team_join':
-        function_name = resolve_function_name('worker')
+        function = func_to_invoke('worker')
 
         data = {
             "user": body['event']['user'],
             "action_id": 'worker_team_join'
         }
 
-        invoke_lambda(function_name, data)
+        function(data)
 
     if 'command' in body and body['command'] == '/start':
         user_slack_id = body['user_id']
@@ -44,7 +42,6 @@ def lambda_handler(event, context):
     # when the button was clicked in the chat
     elif body['type'] == 'block_actions' and 'response_url' in body:
         action_id = body['actions'][0]['action_id']
-        lambda_to_invoke = action_id.split('_')[0]
 
         # when 'Return to main menu' button was clicked
         if action_id.startswith('start'):
@@ -52,13 +49,13 @@ def lambda_handler(event, context):
             respond_with_menu(body['response_url'], user_slack_id)
 
             return STATUS_CODE_200
-        # check if correct action_id was sent
-        elif lambda_to_invoke not in ['worker', 'request', 'bonus']:
+
+        elif action_id.split('_')[0] not in ['worker', 'request', 'bonus']:
             respond_with_error_return_menu(body['response_url'])
 
             return STATUS_CODE_200
 
-        function_name = resolve_function_name(lambda_to_invoke)
+        function = func_to_invoke(action_id.split('_')[0])
 
         data = {
             "response_url": body['response_url'],
@@ -67,22 +64,19 @@ def lambda_handler(event, context):
             "action_id": action_id
         }
 
-        invoke_lambda(function_name, data)
+        function(data)
 
     # when the modal was submitted
     elif body['type'] == 'view_submission':
 
         callback_id = body['view']['callback_id']
-        lambda_to_invoke = callback_id.split('_')[0]
-
-        # example 'arn:aws:lambda:us-east-1:740564522202:function:worker-lambda'
-        function_name = resolve_function_name(lambda_to_invoke)
+        function = func_to_invoke(callback_id.split('_')[0])
 
         data = {
             "body": body,
             "action_id": callback_id
         }
 
-        invoke_lambda(function_name, data)
+        function(data)
 
     return STATUS_CODE_200

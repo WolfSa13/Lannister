@@ -99,19 +99,26 @@ class RequestQuery:
     # response = requests.post(url=url, data=data) (data оця з агрументів)
     @staticmethod
     def add_new_request(data):
-        with Session(engine) as session:
-            try:
-                new_request = Request(**data)
-                session.add(new_request)
-                session.flush()
-                create_request_id = new_request.id
+        BASE_URL = 'https://cdka1dmmkj.execute-api.us-east-1.amazonaws.com/test'
+        url = f'{BASE_URL}/requests'
 
-                session.commit()
-            except db.exc.SQLAlchemyError as e:
-                session.rollback()
-                return 0
+        response = requests.post(url=url, data=data)
 
-        return create_request_id
+        response.status_code
+        response.json()
+        # with Session(engine) as session:
+        #     try:
+        #         new_request = Request(**data)
+        #         session.add(new_request)
+        #         session.flush()
+        #         create_request_id = new_request.id
+        #
+        #         session.commit()
+        #     except db.exc.SQLAlchemyError as e:
+        #         session.rollback()
+        #         return 0
+        #
+        # return create_request_id
 
     # import requests
     #
