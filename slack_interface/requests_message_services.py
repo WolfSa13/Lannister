@@ -1002,8 +1002,12 @@ def request_edit_modal(request, user):
 
     reviewer_options = []
     for reviewer in reviewer_list:
-        if user['id'] == reviewer['id']:
+        if user['id'] == reviewer['id'] and user['id'] != request['reviewer']:
             continue
+
+        if user['id'] == request['reviewer']:
+            if reviewer['id'] == request['creator']:
+                continue
 
         reviewer_item = {
             "text": {
