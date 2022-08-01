@@ -107,6 +107,17 @@ class RequestQuery:
 
         return None
 
+    @staticmethod
+    def get_requests_by_payment_date():
+        url = f'{URL}?type=6'
+
+        response = requests.get(url=url)
+
+        if response.status_code == 200:
+            return response.json()
+
+        return None
+
 
 class RequestHistoryQuery:
     @staticmethod

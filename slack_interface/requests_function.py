@@ -458,3 +458,26 @@ def requests_function(event):
             }
 
             requests.post(response_url_modal, data=json.dumps(data), headers=headers)
+
+    elif action_id == 'request_payment_day':
+        print('request_payment_day')
+        requests_to_pay = RequestQuery.get_requests_by_payment_date()
+
+        response_url = 'https://slack.com/api/chat.postMessage'
+
+        headers = {
+            'Content-type': 'application/json',
+            "Authorization": "Bearer " + SLACK_BOT_TOKEN
+        }
+
+        for key, value in requests_to_pay.items():
+            print(key)
+            attachments = generate_notification_payment_day(value)
+
+            data = {
+                "token": SLACK_BOT_TOKEN,
+                "channel": key,
+                "attachments": attachments
+            }
+
+            requests.post(response_url, data=json.dumps(data), headers=headers)

@@ -12,6 +12,17 @@ STATUS_CODE_200 = {
 
 
 def lambda_handler(event, context):
+    if 'type' in event and event['type'] == 'check_payment':
+        function = func_to_invoke('request')
+
+        data = {
+            "action_id": event['action_id']
+        }
+
+        function(data)
+
+        return STATUS_CODE_200
+
     body = event['body']
     isBase64Encoded = event['isBase64Encoded']
 
@@ -78,5 +89,6 @@ def lambda_handler(event, context):
         }
 
         function(data)
+
 
     return STATUS_CODE_200
