@@ -2,7 +2,7 @@ import json
 import requests
 import os
 from workers_message_services import *
-from workers_orm_services import UsersQuery
+from orm_services import UsersQuery
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 RESPONSE_URL = 'https://slack.com/api/views.open'
@@ -11,6 +11,11 @@ RESPONSE_URL = 'https://slack.com/api/views.open'
 # start action, that print three button
 def workers_function(event):
     action_id = event['action_id']
+
+    headers = {
+        'Content-type': 'application/json',
+        "Authorization": "Bearer " + SLACK_BOT_TOKEN
+    }
 
     if action_id == "worker_get":
         user = UsersQuery.get_user_by_slack_id(event['user_slack_id'])
@@ -26,13 +31,6 @@ def workers_function(event):
 
         response_url = event['response_url']
 
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
-        requests.post(response_url, data=json.dumps(data), headers=headers)
-
     elif action_id.startswith("worker_list"):
 
         users_list = UsersQuery.get_users()
@@ -47,13 +45,6 @@ def workers_function(event):
 
         response_url = event['response_url']
 
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
-        requests.post(response_url, data=json.dumps(data), headers=headers)
-
     # create new user modal window
     elif action_id.startswith("worker_create"):
         data = {
@@ -62,13 +53,6 @@ def workers_function(event):
         }
 
         response_url = RESPONSE_URL
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
-        requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id == "worker_modal_create":
         full_name_block_id = event['body']['view']['blocks'][0]['block_id']
@@ -124,13 +108,6 @@ def workers_function(event):
 
         response_url = 'https://slack.com/api/views.open'
 
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
-        requests.post(response_url, data=json.dumps(data), headers=headers)
-
     elif action_id == 'worker_team_join':
         new_user_data = {
             'full_name': event['user']['real_name'],
@@ -151,13 +128,6 @@ def workers_function(event):
 
             response_url = 'https://slack.com/api/chat.postMessage'
 
-            headers = {
-                'Content-type': 'application/json',
-                "Authorization": "Bearer " + SLACK_BOT_TOKEN
-            }
-
-            requests.post(response_url, data=json.dumps(message_data), headers=headers)
-
     # modal window for edit user profile
     elif action_id.startswith("worker_edit"):
         user_id = int(action_id.split('_')[2])
@@ -170,13 +140,6 @@ def workers_function(event):
             }
 
         response_url = RESPONSE_URL
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
-        res = requests.post(response_url, data=json.dumps(data), headers=headers)
-
 
     elif action_id.startswith("worker_modal_edit"):
 
@@ -214,7 +177,6 @@ def workers_function(event):
 
         view = worker_error_modal()
 
-
         if users_updated:
             view = worker_edited_successfully_modal(user)
 
@@ -224,15 +186,6 @@ def workers_function(event):
         }
 
         response_url = RESPONSE_URL
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
-        # res = requests.post(response_url, data=json.dumps(view_data), headers=headers)
-        res = requests.post(response_url, json=view_data, headers=headers)
-
 
     elif action_id.startswith("worker_delete_"):
         user_id = int(action_id.split('_')[2])
@@ -251,9 +204,4 @@ def workers_function(event):
 
         response_url = 'https://slack.com/api/views.open'
 
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
-        requests.post(response_url, data=json.dumps(data), headers=headers)
+    requests.post(response_url, data=json.dumps(data), headers=headers)

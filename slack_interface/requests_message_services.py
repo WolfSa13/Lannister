@@ -1,8 +1,6 @@
 from datetime import date, datetime
 
-from workers_orm_services import UsersQuery
-from bonuses_orm_services import TypeBonusesQuery
-# from utils import datetime_converter, date_converter
+from orm_services import UsersQuery, TypeBonusesQuery
 
 
 def datetime_converter(date_time):
@@ -635,7 +633,6 @@ def generate_request_block_list(request_list, user, action_id):
 
             attachments[-1]['blocks'][0]['elements'].append(back_to_request_start_menu_button)
 
-    print(attachments)
     return attachments
 
 
@@ -1130,6 +1127,7 @@ def request_edit_modal(request, user):
             }
         ]
     }
+
 
 def generate_notification_payment_day(request_list):
     current_date = date.today().strftime("%Y-%m-%d")
