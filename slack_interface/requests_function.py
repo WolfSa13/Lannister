@@ -3,8 +3,7 @@ import requests
 import os
 
 from requests_message_services import *
-from requests_orm_services import RequestQuery, RequestHistoryQuery
-from workers_orm_services import UsersQuery
+from orm_services import RequestQuery, RequestHistoryQuery,UsersQuery
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 
@@ -29,6 +28,11 @@ def authenticate_request_list(request_list, user):
 def requests_function(event):
     action_id = event['action_id']
 
+    headers = {
+        'Content-type': 'application/json',
+        "Authorization": "Bearer " + SLACK_BOT_TOKEN
+    }
+
     if action_id == 'request_start_menu':
         data = {
             "response_type": 'in_channel',
@@ -38,15 +42,9 @@ def requests_function(event):
 
         response_url = event['response_url']
 
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('request_list'):
-        # user = UsersQuery.get_user_by_slack_id(event['user']['id'])
         user = UsersQuery.get_user_by_slack_id(event['user']['id'])
 
         data = {
@@ -95,24 +93,9 @@ def requests_function(event):
                 else:
                     query_name = action_id.split('_')[5]
                     request_list = RequestQuery.get_administrator_all_requests(query_name)
-                    """
-                    action_id - something like "request_list_administrator_all_requests_pending"
-                    we get 6th word of it
-                    query_name must be:
-                        - "pending"
-                        - "unpaid"
-                        - "paid"
-                        - "denied"
-                        - "deleted"
-                    """
                     data['attachments'] = generate_request_block_list(request_list, user, action_id)
 
         response_url = event['response_url']
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
 
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
@@ -122,11 +105,6 @@ def requests_function(event):
         }
 
         response_url = event['response_url']
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
 
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
@@ -138,11 +116,6 @@ def requests_function(event):
         }
 
         response_url = 'https://slack.com/api/views.open'
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
 
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
@@ -158,11 +131,6 @@ def requests_function(event):
         }
 
         response_url = 'https://slack.com/api/views.open'
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
 
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
@@ -180,11 +148,6 @@ def requests_function(event):
 
         response_url = event['response_url']
 
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('request_status'):
@@ -193,14 +156,8 @@ def requests_function(event):
         editor_slack_id = event['user']['id']
         editor = UsersQuery.get_user_by_slack_id(editor_slack_id)
 
-
         response_url_message = 'https://slack.com/api/chat.postMessage'
         response_url_modal = 'https://slack.com/api/views.open'
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
 
         if action_id.split('_')[2] == "approve":
             status = 'approved'
@@ -270,11 +227,6 @@ def requests_function(event):
 
         response_url = 'https://slack.com/api/views.open'
 
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
         requests.post(response_url, data=json.dumps(data), headers=headers)
 
     elif action_id.startswith('request_modal_create'):
@@ -326,11 +278,6 @@ def requests_function(event):
         created_request = RequestQuery.add_new_request(data)
         response_url_message = 'https://slack.com/api/chat.postMessage'
         response_url_modal = 'https://slack.com/api/views.open'
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
 
         view = request_error_modal
 
@@ -416,11 +363,6 @@ def requests_function(event):
         response_url_message = 'https://slack.com/api/chat.postMessage'
         response_url_modal = 'https://slack.com/api/views.open'
 
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
         view = request_error_modal
 
         if updated_request:
@@ -464,11 +406,6 @@ def requests_function(event):
         requests_to_pay = RequestQuery.get_requests_by_payment_date()
 
         response_url = 'https://slack.com/api/chat.postMessage'
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
 
         for key, value in requests_to_pay.items():
             print(key)

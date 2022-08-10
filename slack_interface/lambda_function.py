@@ -90,5 +90,4 @@ def lambda_handler(event, context):
 
         function(data)
 
-
     return STATUS_CODE_200

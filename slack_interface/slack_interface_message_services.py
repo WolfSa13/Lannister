@@ -2,7 +2,6 @@ import requests
 from utils import *
 
 
-
 def get_main_menu_blocks(user_slack_id):
     workers_action_id = 'worker_start_menu'
     requests_action_id = 'request_start_menu'

@@ -3,14 +3,18 @@ import requests
 import os
 
 from bonuses_message_services import *
-from bonuses_orm_services import TypeBonusesQuery
-from workers_orm_services import UsersQuery
+from orm_services import TypeBonusesQuery, UsersQuery
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 
 
 def bonuses_function(event):
     action_id = event['action_id']
+
+    headers = {
+        'Content-type': 'application/json',
+        "Authorization": "Bearer " + SLACK_BOT_TOKEN
+    }
 
     if action_id.startswith('bonus_list'):
         user = UsersQuery.get_user_by_slack_id(event['user']['id'])
@@ -27,11 +31,6 @@ def bonuses_function(event):
 
         response_url = event['response_url']
 
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
     # button responsible for posting modal, to create new bonus
     elif action_id.startswith('bonus_create'):
         data = {
@@ -40,11 +39,6 @@ def bonuses_function(event):
         }
 
         response_url = 'https://slack.com/api/views.open'
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
 
     # button responsible for returning to the start menu
     elif action_id.startswith('bonus_start_menu'):
@@ -56,11 +50,6 @@ def bonuses_function(event):
         }
 
         response_url = event['response_url']
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
 
     # buttons responsible for posting modal, to edit existing bonus
     elif action_id.startswith('bonus_edit'):
@@ -75,11 +64,6 @@ def bonuses_function(event):
             }
 
             response_url = 'https://slack.com/api/views.open'
-
-            headers = {
-                'Content-type': 'application/json',
-                "Authorization": "Bearer " + SLACK_BOT_TOKEN
-            }
 
     # buttons responsible for deleting bonus
     elif action_id.startswith('bonus_delete'):
@@ -99,19 +83,7 @@ def bonuses_function(event):
 
         response_url = 'https://slack.com/api/views.open'
 
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
-
     elif action_id.startswith('bonus_modal_create'):
-        '''
-        event = {
-            "action_id": callback_id,
-            "body": body
-        }
-        '''
-
         bonus_name_block_id = event['body']['view']['blocks'][0]['block_id']
         bonus_description_block_id = event['body']['view']['blocks'][1]['block_id']
 
@@ -140,11 +112,6 @@ def bonuses_function(event):
         }
 
         response_url = 'https://slack.com/api/views.open'
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
 
     elif action_id.startswith('bonus_modal_edit'):
 
@@ -178,10 +145,5 @@ def bonuses_function(event):
         }
 
         response_url = 'https://slack.com/api/views.open'
-
-        headers = {
-            'Content-type': 'application/json',
-            "Authorization": "Bearer " + SLACK_BOT_TOKEN
-        }
 
     requests.post(response_url, data=json.dumps(data), headers=headers)
