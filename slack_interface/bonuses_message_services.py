@@ -1,3 +1,119 @@
+bonus_edited_successfully = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": "Bonus was edited successfully"
+    }
+}
+
+bonus_deleted_successfully_modal = {
+    "title": {
+        "type": "plain_text",
+        "text": "Success"
+    },
+    "type": "modal",
+    "close": {
+        "type": "plain_text",
+        "text": "Close"
+    },
+    "blocks": [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "Bonus was deleted successfully!"
+            }
+        }
+    ]
+}
+
+bonus_deleted_successfully = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": f"Bonus was deleted successfully"
+    }
+}
+
+error_message = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": f"An error occurred. Are You sure, that You've done right action? When yes, try again!"
+    }
+}
+
+back_to_bonus_start_menu_button = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Update"
+                    },
+                    "action_id": "bonus_list"
+                },
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": "bonus_start_menu"
+                }
+            ]
+        }
+    ]
+}
+
+bonus_create_modal = {
+    "title": {
+        "type": "plain_text",
+        "text": "Create new bonus"
+    },
+    "submit": {
+        "type": "plain_text",
+        "text": "Create"
+
+    },
+    "type": "modal",
+    "callback_id": "bonus_modal_create",
+    "close": {
+        "type": "plain_text",
+        "text": "Cancel"
+    },
+    "blocks": [
+        {
+            "type": "input",
+            "label": {
+                "type": "plain_text",
+                "text": "Bonus name"
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "bonus_name_input"
+            },
+        },
+        {
+            "type": "input",
+            "label": {
+                "type": "plain_text",
+                "text": "Description"
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "bonus_description_input",
+                "multiline": True
+            }
+        }
+    ]
+}
+
+
 def generate_bonus_block_list(bonus_list, user):
     attachments = []
 
@@ -54,15 +170,6 @@ def generate_bonus_block_list(bonus_list, user):
     attachments.append(back_to_bonus_start_menu_button)
 
     return attachments
-
-
-bonus_edited_successfully = {
-    "type": "section",
-    "text": {
-        "type": "plain_text",
-        "text": "Bonus was edited successfully"
-    }
-}
 
 
 def bonus_created_successfully_modal(data):
@@ -139,28 +246,6 @@ def bonus_edited_successfully_modal(data):
     }
 
 
-bonus_deleted_successfully_modal = {
-    "title": {
-        "type": "plain_text",
-        "text": "Success"
-    },
-    "type": "modal",
-    "close": {
-        "type": "plain_text",
-        "text": "Close"
-    },
-    "blocks": [
-        {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": "Bonus was deleted successfully!"
-            }
-        }
-    ]
-}
-
-
 def bonus_error_modal():
     return {
         "title": {
@@ -182,23 +267,6 @@ def bonus_error_modal():
             }
         ]
     }
-
-
-bonus_deleted_successfully = {
-    "type": "section",
-    "text": {
-        "type": "plain_text",
-        "text": f"Bonus was deleted successfully"
-    }
-}
-
-error_message = {
-    "type": "section",
-    "text": {
-        "type": "plain_text",
-        "text": f"An error occurred. Are You sure, that You've done right action? When yes, try again!"
-    }
-}
 
 
 def bonus_start_menu(user):
@@ -248,77 +316,6 @@ def bonus_start_menu(user):
         bonus_start_menu_const[2]['elements'].insert(1, create_button)
 
     return bonus_start_menu_const
-
-
-back_to_bonus_start_menu_button = {
-    "color": "#008000",
-    "blocks": [
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Update"
-                    },
-                    "action_id": "bonus_list"
-                },
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Back"
-                    },
-                    "action_id": "bonus_start_menu"
-                }
-            ]
-        }
-    ]
-}
-
-bonus_create_modal = {
-    "title": {
-        "type": "plain_text",
-        "text": "Create new bonus"
-    },
-    "submit": {
-        "type": "plain_text",
-        "text": "Create"
-
-    },
-    "type": "modal",
-    "callback_id": "bonus_modal_create",
-    "close": {
-        "type": "plain_text",
-        "text": "Cancel"
-    },
-    "blocks": [
-        {
-            "type": "input",
-            "label": {
-                "type": "plain_text",
-                "text": "Bonus name"
-            },
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "bonus_name_input"
-            },
-        },
-        {
-            "type": "input",
-            "label": {
-                "type": "plain_text",
-                "text": "Description"
-            },
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "bonus_description_input",
-                "multiline": True
-            }
-        }
-    ]
-}
 
 
 def bonus_edit_modal(bonus):

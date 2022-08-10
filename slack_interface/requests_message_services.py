@@ -16,6 +16,7 @@ def date_converter(date):
 
     return converted_date
 
+
 request_start_menu = [
     {
         "type": "header",
@@ -429,6 +430,56 @@ back_to_request_list_administrator_all_requests = {
     "action_id": 'request_list_administrator_all_requests'
 }
 
+back_to_request_list_button = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": "request_message_delete"
+                }
+            ]
+        }
+    ]
+}
+
+request_list_buttons = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": []
+        }
+    ]
+}
+
+request_error_modal = {
+    "title": {
+        "type": "plain_text",
+        "text": "Error"
+    },
+    "type": "modal",
+    "close": {
+        "type": "plain_text",
+        "text": "Close"
+    },
+    "blocks": [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "Oops, something went wrong, please, try again!"
+            }
+        }
+    ]
+}
+
 
 def update_request_list_administrator_all_requests_button(query_name):
     action_id = 'request_list_administrator_all_requests_' + query_name
@@ -440,17 +491,6 @@ def update_request_list_administrator_all_requests_button(query_name):
         },
         "action_id": action_id
     }
-
-
-request_list_buttons = {
-    "color": "#008000",
-    "blocks": [
-        {
-            "type": "actions",
-            "elements": []
-        }
-    ]
-}
 
 
 def generate_request_block_list(request_list, user, action_id):
@@ -651,26 +691,6 @@ def request_history_string(request_id):
     }
 
 
-back_to_request_list_button = {
-    "color": "#008000",
-    "blocks": [
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Back"
-                    },
-                    "action_id": "request_message_delete"
-                }
-            ]
-        }
-    ]
-}
-
-
 def generate_request_history_block_list(request_history_list):
     attachments = [request_history_string(request_history_list[0]['request_id'])]
 
@@ -820,28 +840,6 @@ def request_status_changed_successfully_modal(request_id, data):
             }
         ]
     }
-
-
-request_error_modal = {
-    "title": {
-        "type": "plain_text",
-        "text": "Error"
-    },
-    "type": "modal",
-    "close": {
-        "type": "plain_text",
-        "text": "Close"
-    },
-    "blocks": [
-        {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": "Oops, something went wrong, please, try again!"
-            }
-        }
-    ]
-}
 
 
 def request_deleted_successfully_modal(request_id):
