@@ -8,7 +8,6 @@ SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 RESPONSE_URL = 'https://slack.com/api/views.open'
 
 
-# start action, that print three button
 def workers_function(event):
     action_id = event['action_id']
 
@@ -45,7 +44,6 @@ def workers_function(event):
 
         response_url = event['response_url']
 
-    # create new user modal window
     elif action_id.startswith("worker_create"):
         data = {
             "trigger_id": event['trigger_id'],
@@ -128,7 +126,6 @@ def workers_function(event):
 
             response_url = 'https://slack.com/api/chat.postMessage'
 
-    # modal window for edit user profile
     elif action_id.startswith("worker_edit"):
         user_id = int(action_id.split('_')[2])
         user = UsersQuery.get_user_by_id(user_id)
@@ -180,7 +177,7 @@ def workers_function(event):
         if users_updated:
             view = worker_edited_successfully_modal(user)
 
-        view_data = {
+        data = {
             "trigger_id": event['body']['trigger_id'],
             "view": view
         }

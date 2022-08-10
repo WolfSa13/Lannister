@@ -22,6 +22,168 @@ roles_options = [
     }
 ]
 
+worker_create_modal = {
+    "title": {
+        "type": "plain_text",
+        "text": "Create new user"
+    },
+    "submit": {
+        "type": "plain_text",
+        "text": "Create"
+    },
+    "type": "modal",
+    "callback_id": "worker_modal_create",
+    "close": {
+        "type": "plain_text",
+        "text": "Cancel"
+    },
+    "blocks": [
+        {
+            "type": "input",
+            "label": {
+                "type": "plain_text",
+                "text": "Full name"
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "full_name_input"
+            }
+        },
+        {
+            "type": "input",
+            "label": {
+                "type": "plain_text",
+                "text": "Position"
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "position_input"
+            },
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Role"
+            },
+            "accessory": {
+                "type": "checkboxes",
+                "options": roles_options,
+                "action_id": "worker_roles_input"
+            }
+        },
+        {
+            "type": "input",
+            "label": {
+                "type": "plain_text",
+                "text": "Slack_id"
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "slack_id_input"
+            }
+        }
+    ]
+}
+
+worker_deleted_successfully_modal = {
+    "title": {
+        "type": "plain_text",
+        "text": "Success"
+    },
+    "type": "modal",
+    "close": {
+        "type": "plain_text",
+        "text": "Close"
+    },
+    "blocks": [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "Bonus was deleted successfully!"
+            }
+        }
+    ]
+}
+
+user_start_menu = [
+    {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Workers"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
+        "type": "actions",
+        "elements": [
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Workers List"
+                },
+                "action_id": "worker_list"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Create worker"
+                },
+                "action_id": "worker_create"
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Return to main menu"
+                },
+                "action_id": "start"
+            }
+        ]
+    }
+]
+
+back_to_user_start_menu_button = {
+    "color": "#008000",
+    "blocks": [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Update"
+                    },
+                    "action_id": "worker_list"
+                },
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Back"
+                    },
+                    "action_id": "worker_start_menu"
+                }
+            ]
+        }
+    ]
+}
+
+new_team_member_greeting = {
+    "type": "section",
+    "text": {
+        "type": "plain_text",
+        "text": "Welcome to the COXIT team!\nI am Lannister. To start work with me use the /start command"
+    }
+}
+
 
 def get_user_by_id(user_id, users_list):
     for user in users_list:
@@ -87,71 +249,6 @@ def generate_user_block_list(user_list):
     attachments.append(back_to_user_start_menu_button)
 
     return attachments
-
-
-worker_create_modal = {
-    "title": {
-        "type": "plain_text",
-        "text": "Create new user"
-    },
-    "submit": {
-        "type": "plain_text",
-        "text": "Create"
-    },
-    "type": "modal",
-    "callback_id": "worker_modal_create",
-    "close": {
-        "type": "plain_text",
-        "text": "Cancel"
-    },
-    "blocks": [
-        {
-            "type": "input",
-            "label": {
-                "type": "plain_text",
-                "text": "Full name"
-            },
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "full_name_input"
-            }
-        },
-        {
-            "type": "input",
-            "label": {
-                "type": "plain_text",
-                "text": "Position"
-            },
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "position_input"
-            },
-        },
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": "Role"
-            },
-            "accessory": {
-                "type": "checkboxes",
-                "options": roles_options,
-                "action_id": "worker_roles_input"
-            }
-        },
-        {
-            "type": "input",
-            "label": {
-                "type": "plain_text",
-                "text": "Slack_id"
-            },
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "slack_id_input"
-            }
-        }
-    ]
-}
 
 
 def initial_role_block(role):
@@ -269,7 +366,6 @@ def worker_error_modal():
 
 
 def worker_created_successfully_modal(user):
-
     return {
         "title": {
             "type": "plain_text",
@@ -369,105 +465,6 @@ def worker_edited_successfully_modal(user):
             }
         ]
     }
-
-
-worker_deleted_successfully_modal = {
-    "title": {
-        "type": "plain_text",
-        "text": "Success"
-    },
-    "type": "modal",
-    "close": {
-        "type": "plain_text",
-        "text": "Close"
-    },
-    "blocks": [
-        {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": "Bonus was deleted successfully!"
-            }
-        }
-    ]
-}
-
-user_start_menu = [
-    {
-        "type": "header",
-        "text": {
-            "type": "plain_text",
-            "text": "Workers"
-        }
-    },
-    {
-        "type": "divider"
-    },
-    {
-        "type": "actions",
-        "elements": [
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Workers List"
-                },
-                "action_id": "worker_list"
-            },
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Create worker"
-                },
-                "action_id": "worker_create"
-            },
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Return to main menu"
-                },
-                "action_id": "start"
-            }
-        ]
-    }
-]
-
-back_to_user_start_menu_button = {
-    "color": "#008000",
-    "blocks": [
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Update"
-                    },
-                    "action_id": "worker_list"
-                },
-{
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Back"
-                    },
-                    "action_id": "worker_start_menu"
-                }
-            ]
-        }
-    ]
-}
-
-new_team_member_greeting = {
-    "type": "section",
-    "text": {
-        "type": "plain_text",
-        "text": "Welcome to the COXIT team!\nI am Lannister. To start work with me use the /start command"
-    }
-}
 
 
 def check_if_cpp_dev(position):

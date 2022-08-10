@@ -41,9 +41,3 @@ def func_to_invoke(function_name):
 
     return function_to_invoke
 
-
-def logger(data):
-    print('--------------------------------------------------------------------')
-    print('INFO:')
-    print(data)
-    print('--------------------------------------------------------------------')

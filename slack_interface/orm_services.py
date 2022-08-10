@@ -244,13 +244,7 @@ class UsersQuery:
     def update_user(user_id, data):
         url = f'{URL}/{user_id}'
 
-        print(url)
-        print(data)
-
         response = requests.patch(url=url, json=data)
-
-        print(response.status_code)
-        print(response.json())
 
         if response.status_code == 200:
             return response.json()
@@ -270,12 +264,8 @@ class UsersQuery:
 
     @staticmethod
     def add_new_user(data):
-        print(data)
 
         response = requests.post(url=URL, json=data)
-
-        print(response.status_code)
-        print(response.json())
 
         if response.status_code == 201:
             return response.json()
