@@ -1,0 +1,30 @@
+service: rest
+useDotenv: true
+
+provider:
+  name: aws
+  profile: commonAccount
+  stage: dev
+  region: ${env:REGION}
+  ecr:
+    images:
+      slack-interface-image:
+        path: .
+        file: slack-interface.Dockerfile
+
+
+functions:
+  slack-interface-lambda:
+    image:
+      name: slack-interface-image
+    url: true
+    environment:
+        SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+        BASE_URL: ${env:BASE_URL}
+    events:
+      - eventBridge:
+          schedule: cron(0 6 ? * 2-6 *)
+#          schedule: cron(*/1 * ? * * *)
+          input:
+            type: check_payment
+            action_id: request_payment_day
